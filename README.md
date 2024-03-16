@@ -14,7 +14,6 @@ USA-Train      |  178110 | 154908 |
 USA-Val      |  17234 | 16784     |
 Asia-Train      |  187426 | 68722 | 
 Asia-Val      |  26923 | 9636     |
-Asia-Test |      TBD   | TBD      | 
 
 Our GeoNet dataset is the largest yet for geographical domain adaptation, covering image classification as well as scene classification tasks. Additionally, the challenge also involves universal domain adaptation, please see the challenge [website](https://geonet-challenge.github.io/ICCV2023/challenge.html) for the details.
 
