@@ -2,7 +2,10 @@ import numpy as np
 import torch
 from utils import calc_coeff
 
-
+def mmd_linear(f_of_X, f_of_Y):
+    delta = f_of_X - f_of_Y
+    loss = torch.mean(torch.mm(delta, torch.transpose(delta, 0, 1)))
+    return loss
 def maximum_mean_discrepancies( x, y, kernel="multiscale"):
     """
     # https://www.kaggle.com/code/onurtunali/maximum-mean-discrepancy/notebook
@@ -64,11 +67,12 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
     for cls in unique_cls_src:
         imfeat_src_filtered = imfeat_src[lbl_src==cls]
         imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
-        mmd_loss += maximum_mean_discrepancies(
-            imfeat_src_filtered,
-            imfeat_tgt_filtered,
-            kernel="multiscale"
-        )
+        mmd_loss += mmd_linear(imfeat_src_filtered, imfeat_tgt_filtered)
+        # mmd_loss += maximum_mean_discrepancies(
+        #     imfeat_src_filtered,
+        #     imfeat_tgt_filtered,
+        #     kernel="multiscale"
+        # )
 
     print("end MMD")
 
@@ -77,7 +81,7 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
     closs = torch.mean(criterion_cls(output_src, lbl_src).squeeze())
 
     # compute loss
-
+    print("closs is", closs)
     loss = closs + mmd_loss_adjusted
     print("loss is ", loss.detach)
     # back propagation
