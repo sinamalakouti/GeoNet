@@ -79,7 +79,7 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
     # compute loss
 
     loss = closs + mmd_loss_adjusted
-    print("loss is " loss.detach)
+    print("loss is ", loss.detach)
     # back propagation
     loss.backward()
     opt.step()
