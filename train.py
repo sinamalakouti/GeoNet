@@ -8,16 +8,13 @@ import numpy as np
 import torch
 from torch import inverse, nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
 
 from loader import get_dataloader
-from loader.joint_class_aware_loader import BalancedClassSampler
 from models import get_model
 from optimizers import get_optimizer, get_scheduler
 from UDA_trainer import get_trainer, val
 from losses import get_loss
 from utils import cvt2normal_state, get_logger, loop_iterable, get_parameter_count
-
 
 torch.autograd.set_detect_anomaly(True)
 
@@ -25,8 +22,8 @@ torch.autograd.set_detect_anomaly(True)
 # from tensorboardX import SummaryWriter
 
 def main():
-    # if not torch.cuda.is_available():
-    #     raise SystemExit('GPU is needed')
+    if not torch.cuda.is_available():
+        raise SystemExit('GPU is needed')
 
     # setup random seeds
     seed = cfg.get('seed', 1234)
@@ -40,63 +37,30 @@ def main():
 
     # setup data loader
     splits = ['train', 'test']
-    # data_src = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
-    # data_tgt = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-
-    data_all = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
-    # batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
-    # data_src = data_src['train'].dataset
-    # data_tgt = data_tgt['train'].dataset
-    data_all = data_all['train'].dataset
-    sampler = BalancedClassSampler(data_all, num_samples_per_class=10, batch_size=60)
-
-    # data_loader_src = DataLoader(data_src, batch_sampler=sampler)
-    # data_loader_tgt = DataLoader(data_tgt, batch_sampler=sampler)
-    data_loader_all = DataLoader(data_all, batch_sampler=sampler)
-    i = 0
-    print("len is ", len(data_loader_all))
-    for data_all in data_loader_all:
-        src_data = data_all['src_data']
-        tgt_data = data_all['tgt_data']
-        print("i is ", i)
-        # print(src_data[-1])
-        # print(tgt_data[-1])
-        # print(len(tgt_data[0]))
-        # print(src_data)
-        i+=1
-    print("num batches is ", i)
-        # tgt_indices, tgt_labels = tgt_data
-
-        # src_images = [data_src.images[i] for i in src_indices]  # Assuming dataset has an `images` attribute
-        # tgt_images = [data_tgt.images[i] for i in tgt_indices]
+    data_loader_src = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
+    data_loader_tgt = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
+    batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
 
     n_classes = cfg["model"]["classifier"]["n_class"]
 
     # setup model (feature extractor(s) + classifier(s) + discriminator)
-    if not torch.cuda.is_available():
-        device = 'cpu'
-        n_gpu = 0
-
-    else:
-        device = 'cuda'
-        n_gpu = torch.cuda.device_count()
-
-    model_fe = get_model(cfg['model']['feature_extractor']).to(device)
+    n_gpu = torch.cuda.device_count()
+    model_fe = get_model(cfg['model']['feature_extractor']).cuda()
     params = [{'params': model_fe.parameters(), 'lr': 1}]
     fe_list = [model_fe]
 
-    model_cls = get_model(cfg['model']['classifier']).to(device)
+    model_cls = get_model(cfg['model']['classifier']).cuda()
     params += [{'params': model_cls.parameters(), 'lr': 10}]
     cls_list = [model_cls]
 
     total_n_params = sum([p.numel() for p in model_fe.parameters()]) + \
                      sum([p.numel() for p in model_cls.parameters()])
 
-    # d_list = []
-    # if cfg['model'].get('discriminator', None):
-    #     model_d = get_model(cfg['model']['discriminator']).to(device)
-        # params += [{'params': model_d.parameters(), 'lr': 10}]
-        # d_list = [model_d]
+    d_list = []
+    if cfg['model'].get('discriminator', None):
+        model_d = get_model(cfg['model']['discriminator']).cuda()
+        params += [{'params': model_d.parameters(), 'lr': 10}]
+        d_list = [model_d]
 
     # setup loss criterion. Order and names should match in the trainer file and config file.
     loss_dict = cfg['training']['losses']
@@ -167,7 +131,7 @@ def main():
 
     logger.info('Start training from iteration {}'.format(start_it))
 
-    if n_gpu > 1 and device == 'cuda':
+    if n_gpu > 1:
         logger.info("Using multiple GPUs")
         model_fe = nn.DataParallel(model_fe, device_ids=range(n_gpu))
         model_cls = nn.DataParallel(model_cls, device_ids=range(n_gpu))
@@ -285,17 +249,5 @@ if __name__ == '__main__':
 
     logdir = os.path.join('runs', os.path.basename(args.config)[:-4], cfg['exp'])
     if not os.path.exists(logdir):
-
-
         os.makedirs(logdir, exist_ok=True)
     writer = None  # SummaryWriter(log_dir=logdir)
-
-    print('RUNDIR: {}'.format(logdir))
-    shutil.copy(args.config, logdir)
-
-    logger = get_logger(logdir)
-    logger.info('Start logging')
-
-    logger.info(args)
-
-    main()
