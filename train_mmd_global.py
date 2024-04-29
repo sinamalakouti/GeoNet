@@ -13,7 +13,6 @@ from torch.utils.data import DataLoader
 from loader import get_dataloader
 from loader.joint_class_aware_loader import BalancedClassSampler
 from models import get_model
-from models.mmd_model import BottleNeckFeatureExtractor, MMDClassifer
 from optimizers import get_optimizer, get_scheduler
 from UDA_trainer import get_trainer, val
 from losses import get_loss
