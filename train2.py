@@ -53,7 +53,7 @@ def main():
     cfg['data']['target']['loader'] = 'JSONDataLoader'
     data_src_test = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
     data_tgt_test = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-    sampler = BalancedClassSampler(training_data, num_samples_per_class=10, batch_size=60)
+    sampler = BalancedClassSampler(training_data, num_samples_per_class=20, batch_size=100)
 
     # data_loader_src = DataLoader(data_src, batch_sampler=sampler)
     # data_loader_tgt = DataLoader(data_tgt, batch_sampler=sampler)
