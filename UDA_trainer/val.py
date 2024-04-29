@@ -2,8 +2,8 @@ import torch
 from metrics import averageMeter, accuracy, percls_accuracy
 from collections.abc import Iterable
 
-def val(data_loader, model_fe, model_cls, it, n_classes, logger, writer):
 
+def val(data_loader, model_fe, model_cls, it, n_classes, logger, writer):
     # setup average meters
     losses = averageMeter()
     top1 = averageMeter()
@@ -29,10 +29,10 @@ def val(data_loader, model_fe, model_cls, it, n_classes, logger, writer):
                 features = model_fe(image)
                 output = torch.sum(torch.stack([cls(features) for cls in model_cls]), dim=0)
             else:
-                output = model_cls(model_fe(image), feat=False)
+                output = model_cls(model_fe(image))
 
         # measure accuracy
-        k = min(n_classes-1, 5)
+        k = min(n_classes - 1, 5)
         prec1, prec5 = accuracy(output, target, topk=(1, k))
         top1.update(prec1, image.size(0))
         top5.update(prec5, image.size(0))
@@ -43,7 +43,8 @@ def val(data_loader, model_fe, model_cls, it, n_classes, logger, writer):
 
     classwise_accuracy = percls_accuracy(all_preds, all_labels)
 
-    logger.info('[Val] Iteration {it}\tTop 1 Acc {top1.avg:.3f}\tTop 5 Acc. {top5.avg:.3f}'.format(it=it+1, top1=top1, top5=top5))
+    logger.info('[Val] Iteration {it}\tTop 1 Acc {top1.avg:.3f}\tTop 5 Acc. {top5.avg:.3f}'.format(it=it + 1, top1=top1,
+                                                                                                   top5=top5))
 
     # setting training mode
     model_fe.train()

@@ -146,7 +146,7 @@ class ImageJSONLoader(data.Dataset):
         return return_obj
 
     def __getitem__(self, index):
-        print("getitem  ",index)
+        # print("getitem  ",index)
 
 
         if isinstance(index, list) and len(index) > 0:
