@@ -218,7 +218,7 @@ if __name__ == '__main__':
     parser.add_argument("--json_dir", type=str, help="Metadata Directory")
     parser.add_argument("--trainer", required=True, type=str.lower, choices=valid_trainers, help="Adaptation method.")
     parser.add_argument("--num_iter", type=int, default=100004, help="Total number of iterations")
-    parser.add_argument("--batch_size", type=int, default=300, help="Batch size")
+    parser.add_argument("--batch_size", type=int, default=150, help="Batch size")
     parser.add_argument("--resume", help="Resume training from checkpoint")
     parser.add_argument("--exp_name", help="experiment name")
 
