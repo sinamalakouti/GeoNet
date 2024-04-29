@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 from loader import get_dataloader
 from loader.joint_class_aware_loader import BalancedClassSampler
 from models import get_model
-from models.mmd_model import BottleNeckFeatureExtractor, MMDClassifer
+
 from optimizers import get_optimizer, get_scheduler
 from UDA_trainer import get_trainer, val
 from losses import get_loss
@@ -71,24 +71,17 @@ def main():
         device = 'cuda'
         n_gpu = torch.cuda.device_count()
 
-    # model_fe = get_model(cfg['model']['feature_extractor']).to(device)
-    model_fe = BottleNeckFeatureExtractor()
-    model_cls = MMDClassifer()
+
+    model_fe = get_model(cfg['model']['feature_extractor']).cuda()
     params = [{'params': model_fe.parameters(), 'lr': 1}]
     fe_list = [model_fe]
 
-    # model_cls = get_model(cfg['model']['classifier']).to(device)
+    model_cls = get_model(cfg['model']['classifier']).cuda()
     params += [{'params': model_cls.parameters(), 'lr': 10}]
     cls_list = [model_cls]
 
     total_n_params = sum([p.numel() for p in model_fe.parameters()]) + \
                      sum([p.numel() for p in model_cls.parameters()])
-
-    # d_list = []
-    # if cfg['model'].get('discriminator', None):
-    #     model_d = get_model(cfg['model']['discriminator']).to(device)
-    #     params += [{'params': model_d.parameters(), 'lr': 10}]
-    #     d_list = [model_d]
 
     # setup loss criterion. Order and names should match in the trainer file and config file.
     loss_dict = cfg['training']['losses']
