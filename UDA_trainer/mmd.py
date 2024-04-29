@@ -82,12 +82,12 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
     closs = torch.mean(criterion_cls(output_src, lbl_src).squeeze())
 
     # compute loss
-    print("closs is", closs)
-    print("mmd loss: mm",  mmd_loss_adjusted)
-    print("mmd loss: 22222", mmd_loss)
-    print("mmd loss: 3333", mmd_loss.detach())
+    # print("closs is", closs)
+    # print("mmd loss: mm",  mmd_loss_adjusted)
+    # print("mmd loss: 22222", mmd_loss)
+    # print("mmd loss: 3333", mmd_loss.detach())
     loss = closs + mmd_loss_adjusted
-    print("loss is ", loss.detach)
+    print("loss is ", loss.detach())
     # back propagation
     loss.backward()
     opt.step()

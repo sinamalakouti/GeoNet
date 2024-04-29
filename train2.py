@@ -53,7 +53,7 @@ def main():
     cfg['data']['target']['loader'] = 'JSONDataLoader'
     data_src_test = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
     data_tgt_test = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-    sampler = BalancedClassSampler(training_data, num_samples_per_class=20, batch_size=100)
+    sampler = BalancedClassSampler(training_data, num_samples_per_class=20, batch_size=20)
 
     # data_loader_src = DataLoader(data_src, batch_sampler=sampler)
     # data_loader_tgt = DataLoader(data_tgt, batch_sampler=sampler)
@@ -167,7 +167,8 @@ def main():
     for it in range(start_it, cfg['training']['iteration']):
 
         scheduler.step()
-        for all_data in data_loader_all:
+        for batchid, all_data in enumerate(data_loader_all):
+            print(f"----------batch {it} @ epoch {batchid} ----------")
             src_data = all_data['src_data']
             tgt_data = all_data['tgt_data']
             batch = (src_data, tgt_data)
