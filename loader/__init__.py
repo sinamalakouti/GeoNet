@@ -1,4 +1,5 @@
-from .dataloader import FileDataLoader, ImageDataLoader, JsonDataLoader
+from .class_aware_dataset import ClassWiseDataset
+from .dataloader import FileDataLoader, ImageDataLoader, JsonDataLoader, ClassWiseLoader
 from .json_loader import ImageJSONLoader
 
 
@@ -14,6 +15,7 @@ def _get_loader_instance(name):
             'FileDataLoader': FileDataLoader,
             'ImageDataLoader': ImageDataLoader,
             'JSONDataLoader': JsonDataLoader,
+            'ClassWiseLoader': ClassWiseLoader
         }[name]
     except:
         raise BaseException('Loader type {} not available'.format(name))

@@ -13,6 +13,7 @@ from torch.utils.data import DataLoader
 from loader import get_dataloader
 from loader.joint_class_aware_loader import BalancedClassSampler
 from models import get_model
+from models.mmd_model import BottleNeckFeatureExtractor, MMDClassifer
 from optimizers import get_optimizer, get_scheduler
 from UDA_trainer import get_trainer, val
 from losses import get_loss
@@ -43,32 +44,21 @@ def main():
     # data_src = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
     # data_tgt = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
 
-    data_all = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
+    data_all_loader = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
     # batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
     # data_src = data_src['train'].dataset
     # data_tgt = data_tgt['train'].dataset
-    data_all = data_all['train'].dataset
-    sampler = BalancedClassSampler(data_all, num_samples_per_class=10, batch_size=60)
+    training_data = data_all_loader['train'].dataset
+    cfg['data']['source']['loader'] = 'JSONDataLoader'
+    cfg['data']['target']['loader'] = 'JSONDataLoader'
+    data_src_test = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
+    data_tgt_test = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
+    sampler = BalancedClassSampler(training_data, num_samples_per_class=10, batch_size=60)
 
     # data_loader_src = DataLoader(data_src, batch_sampler=sampler)
     # data_loader_tgt = DataLoader(data_tgt, batch_sampler=sampler)
-    data_loader_all = DataLoader(data_all, batch_sampler=sampler)
-    i = 0
-    print("len is ", len(data_loader_all))
-    for data_all in data_loader_all:
-        src_data = data_all['src_data']
-        tgt_data = data_all['tgt_data']
-        print("i is ", i)
-        # print(src_data[-1])
-        # print(tgt_data[-1])
-        # print(len(tgt_data[0]))
-        # print(src_data)
-        i+=1
-    print("num batches is ", i)
-        # tgt_indices, tgt_labels = tgt_data
+    data_loader_all = DataLoader(training_data, batch_sampler=sampler)
 
-        # src_images = [data_src.images[i] for i in src_indices]  # Assuming dataset has an `images` attribute
-        # tgt_images = [data_tgt.images[i] for i in tgt_indices]
 
     n_classes = cfg["model"]["classifier"]["n_class"]
 
@@ -81,11 +71,13 @@ def main():
         device = 'cuda'
         n_gpu = torch.cuda.device_count()
 
-    model_fe = get_model(cfg['model']['feature_extractor']).to(device)
+    # model_fe = get_model(cfg['model']['feature_extractor']).to(device)
+    model_fe = BottleNeckFeatureExtractor()
+    model_cls = MMDClassifer()
     params = [{'params': model_fe.parameters(), 'lr': 1}]
     fe_list = [model_fe]
 
-    model_cls = get_model(cfg['model']['classifier']).to(device)
+    # model_cls = get_model(cfg['model']['classifier']).to(device)
     params += [{'params': model_cls.parameters(), 'lr': 10}]
     cls_list = [model_cls]
 
@@ -175,16 +167,18 @@ def main():
     for it in range(start_it, cfg['training']['iteration']):
 
         scheduler.step()
-
-        trainer(batch_iterator, model_fe, model_cls, *d_list, opt, it, *criterion_list,
-                cfg, logger, writer)
+        for all_data in data_loader_all:
+            src_data = all_data['src_data']
+            tgt_data = all_data['tgt_data']
+            batch = (src_data, tgt_data)
+            trainer(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer)
 
         if (it + 1) % cfg['training']['val_interval'] == 0:
 
             with torch.no_grad():
-                acc_src, acc_src_top5 = val(data_loader_src['test'], model_fe, model_cls, it, n_classes, logger, writer)
+                acc_src, acc_src_top5 = val(data_src_test['test'], model_fe, model_cls, it, n_classes, logger, writer)
 
-                acc_tgt, acc_tgt_top5 = val(data_loader_tgt['test'], model_fe, model_cls, it, n_classes, logger, writer)
+                acc_tgt, acc_tgt_top5 = val(data_tgt_test['test'], model_fe, model_cls, it, n_classes, logger, writer)
                 is_best = False
                 if acc_tgt > best_acc_tgt:
                     is_best = True
@@ -232,7 +226,7 @@ def main():
 
 if __name__ == '__main__':
     global cfg, args, writer, logger, logdir
-    valid_trainers = ["plain", "cdan"]
+    valid_trainers = ["plain", "cdan", "mmd"]
 
     parser = argparse.ArgumentParser(description='config')
     parser.add_argument(
@@ -285,8 +279,6 @@ if __name__ == '__main__':
 
     logdir = os.path.join('runs', os.path.basename(args.config)[:-4], cfg['exp'])
     if not os.path.exists(logdir):
-
-
         os.makedirs(logdir, exist_ok=True)
     writer = None  # SummaryWriter(log_dir=logdir)
 

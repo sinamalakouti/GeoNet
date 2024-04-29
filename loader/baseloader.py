@@ -46,9 +46,9 @@ class BaseLoader():
             if ('train' in split):
                 self.data_loader[split] = data.DataLoader(
                     dataset, batch_size=batch_size, shuffle=True,
-                    drop_last=drop_last, pin_memory=False, num_workers=num_workers
-                )
+                    drop_last=drop_last, pin_memory=False, num_workers=num_workers)
             else:
+
                 self.data_loader[split] = data.DataLoader(
                 dataset, batch_size=batch_size, shuffle=False,
                 drop_last=drop_last, pin_memory=False, num_workers=num_workers

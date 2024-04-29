@@ -20,7 +20,7 @@ def get_model(model_dict, verbose=False):
     param_dict.pop('arch')
 
     if 'resnet' in name:
-        model = model(**param_dict)
+        model = model(**param_dict).to('cpu')
         model.fc = nn.Identity()
     else:
         model = model(**param_dict)

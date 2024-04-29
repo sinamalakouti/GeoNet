@@ -4,6 +4,7 @@
 ###
 
 from .cdan import train_cdan
+from .mmd import train_mmd
 from .plain import train_plain
 from .dann import train_dann
 from .val import val
@@ -20,6 +21,7 @@ def _get_trainer_instance(name):
             'plain' : train_plain,
             'cdan' : train_cdan,
             'dann' : train_dann,
+            'mmd' : train_mmd
         }[name]
     except:
         raise BaseException('Trainer type {} not available'.format(name))
