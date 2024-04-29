@@ -46,7 +46,8 @@ def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, 
     model_cls.train()
     opt.zero_grad()
 
-    model = model.cuda()
+    model_fe = model_fe.cuda()
+    model_cls = model_cls.cuda()
     # get data
     batch = next(batch_iterator)
     (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = batch['src_data'], batch['tgt_data']
