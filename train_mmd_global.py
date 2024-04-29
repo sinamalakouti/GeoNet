@@ -43,7 +43,8 @@ def main():
     splits = ['train', 'test']
     data_loader_src = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
     data_loader_tgt = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-    # batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
+    batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
+
 
     n_classes = cfg["model"]["classifier"]["n_class"]
 
@@ -139,13 +140,7 @@ def main():
         logger.info("Using multiple GPUs")
         model_fe = nn.DataParallel(model_fe, device_ids=range(n_gpu))
         model_cls = nn.DataParallel(model_cls, device_ids=range(n_gpu))
-    i = 0
-    batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
-    # for it in range(start_it, cfg['training']['iteration']):
-    #     i+=1
-    #     print(i)
-    #     next(batch_iterator)
-    # print("i iss final ", i)
+
     for it in range(start_it, cfg['training']['iteration']):
 
         scheduler.step()

@@ -9,11 +9,9 @@ model:
         # norm: 1 # LDAM
         feat_size: [2048, 256] # [feat_dim, bottleneck_dim]
         n_class: 31 # domainnet
-
 data:
     source:
-        sampler: {'name': 'random'}
-        loader: ClassWiseLoader
+        loader: JSONDataLoader
         data_root: /data/
         n_workers: 4
         drop_last: true
@@ -21,8 +19,7 @@ data:
         loc: false
         meta: false
     target:
-        sampler: {'name': 'random'}
-        loader: ClassWiseLoader #JSONDataLoader
+        loader: JSONDataLoader
         data_root: /data/
         n_workers: 4
         drop_last: true
@@ -36,9 +33,9 @@ training:
             name: cross_entropy
     iteration: 100004
     batch_size: 32
-    val_interval: 200
-    save_interval: 200
-    print_interval: 200
+    val_interval: 5000
+    save_interval: 10000
+    print_interval: 2500
     optimizer:
         name: sgd
         momentum: 0.9
