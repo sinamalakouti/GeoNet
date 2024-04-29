@@ -41,24 +41,9 @@ def main():
 
     # setup data loader
     splits = ['train', 'test']
-    # data_src = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
-    # data_tgt = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-
-    data_all_loader = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
-    # batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
-    # data_src = data_src['train'].dataset
-    # data_tgt = data_tgt['train'].dataset
-    training_data = data_all_loader['train'].dataset
-    cfg['data']['source']['loader'] = 'JSONDataLoader'
-    cfg['data']['target']['loader'] = 'JSONDataLoader'
-    data_src_test = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
-    data_tgt_test = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-    sampler = BalancedClassSampler(training_data, num_samples_per_class=30, batch_size=300)
-
-    # data_loader_src = DataLoader(data_src, batch_sampler=sampler)
-    # data_loader_tgt = DataLoader(data_tgt, batch_sampler=sampler)
-    data_loader_all = DataLoader(training_data, batch_sampler=sampler)
-
+    data_loader_src = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
+    data_loader_tgt = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
+    batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
 
     n_classes = cfg["model"]["classifier"]["n_class"]
 
@@ -71,26 +56,11 @@ def main():
         device = 'cuda'
         n_gpu = torch.cuda.device_count()
 
-    # model_fe = get_model(cfg['model']['feature_extractor']).to(device)
     model_fe = BottleNeckFeatureExtractor()
     model_cls = MMDClassifer()
     params = [{'params': model_fe.parameters(), 'lr': 1}]
-    fe_list = [model_fe]
-
-    # model_cls = get_model(cfg['model']['classifier']).to(device)
     params += [{'params': model_cls.parameters(), 'lr': 10}]
-    cls_list = [model_cls]
 
-    total_n_params = sum([p.numel() for p in model_fe.parameters()]) + \
-                     sum([p.numel() for p in model_cls.parameters()])
-
-    # d_list = []
-    # if cfg['model'].get('discriminator', None):
-    #     model_d = get_model(cfg['model']['discriminator']).to(device)
-    #     params += [{'params': model_d.parameters(), 'lr': 10}]
-    #     d_list = [model_d]
-
-    # setup loss criterion. Order and names should match in the trainer file and config file.
     loss_dict = cfg['training']['losses']
     criterion_list = []
     for loss_name, loss_params in loss_dict.items():
@@ -164,7 +134,7 @@ def main():
         model_fe = nn.DataParallel(model_fe, device_ids=range(n_gpu))
         model_cls = nn.DataParallel(model_cls, device_ids=range(n_gpu))
     i = 0
-    batch_iterator = loop_iterable(data_loader_all)
+    batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
     # for it in range(start_it, cfg['training']['iteration']):
     #     i+=1
     #     print(i)
@@ -181,9 +151,9 @@ def main():
         if (it + 1) % cfg['training']['val_interval'] == 0:
 
             with torch.no_grad():
-                acc_src, acc_src_top5 = val(data_src_test['test'], model_fe, model_cls, it, n_classes, logger, writer)
+                acc_src, acc_src_top5 = val(data_loader_src['test'], model_fe, model_cls, it, n_classes, logger, writer)
 
-                acc_tgt, acc_tgt_top5 = val(data_tgt_test['test'], model_fe, model_cls, it, n_classes, logger, writer)
+                acc_tgt, acc_tgt_top5 = val(data_loader_tgt['test'], model_fe, model_cls, it, n_classes, logger, writer)
                 is_best = False
                 if acc_tgt > best_acc_tgt:
                     is_best = True
