@@ -27,7 +27,6 @@ def main():
 
     # setup random seeds
     seed = cfg.get('seed', 1234)
-    print("hi")
     np.random.seed(seed)
     random.seed(seed)
     torch.manual_seed(seed)
@@ -198,7 +197,6 @@ def main():
 if __name__ == '__main__':
     global cfg, args, writer, logger, logdir
     valid_trainers = ["plain", "cdan"]
-    print("hi")
 
     parser = argparse.ArgumentParser(description='config')
     parser.add_argument(
@@ -253,3 +251,13 @@ if __name__ == '__main__':
     if not os.path.exists(logdir):
         os.makedirs(logdir, exist_ok=True)
     writer = None  # SummaryWriter(log_dir=logdir)
+
+    print('RUNDIR: {}'.format(logdir))
+    shutil.copy(args.config, logdir)
+
+    logger = get_logger(logdir)
+    logger.info('Start logging')
+
+    logger.info(args)
+
+    main()
