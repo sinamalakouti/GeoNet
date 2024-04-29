@@ -99,7 +99,7 @@ def train_mmd_global(batch_iterator, model_fe, model_cls, opt, it, device,cfg, l
             'CLoss {closs:.4f}\t' \
             'mmdloss {mmd_loss:.4f}'.format(
                 it + 1, cfg['training']['iteration'], curr_lr=curr_lr,
-                closs=closs.item(), daloss=mmd_loss.item()
+                closs=closs.item(), mmd_loss=mmd_loss.item()
             )
 
         logger.info(print_str)
