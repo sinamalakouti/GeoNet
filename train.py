@@ -92,11 +92,11 @@ def main():
     total_n_params = sum([p.numel() for p in model_fe.parameters()]) + \
                      sum([p.numel() for p in model_cls.parameters()])
 
-    d_list = []
-    if cfg['model'].get('discriminator', None):
-        model_d = get_model(cfg['model']['discriminator']).to(device)
-        params += [{'params': model_d.parameters(), 'lr': 10}]
-        d_list = [model_d]
+    # d_list = []
+    # if cfg['model'].get('discriminator', None):
+    #     model_d = get_model(cfg['model']['discriminator']).to(device)
+        # params += [{'params': model_d.parameters(), 'lr': 10}]
+        # d_list = [model_d]
 
     # setup loss criterion. Order and names should match in the trainer file and config file.
     loss_dict = cfg['training']['losses']

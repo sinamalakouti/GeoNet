@@ -77,19 +77,19 @@ class ImageJSONLoader():
             for s in split:
                 keytag.append("{}_{}".format(d, s))
 
-        json_data = json.load(open(json_path))
+        self.json_data = json.load(open(json_path))
 
         self.return_ann = return_ann
         self.return_loc = return_loc
         self.return_meta = return_meta
 
-        self.info = json_data['info']
-        self.category_mapping = json_data['categories']
+        self.info = self.json_data['info']
+        self.category_mapping = self.json_data['categories']
 
         self.classname_to_id = {c["category_name"]: int(c["category_id"]) for c in self.category_mapping}
         self.id_to_classname = {v: k for k, v in self.classname_to_id.items()}
 
-        imdata = [json_data[kt] for kt in keytag]
+        imdata = [self.json_data[kt] for kt in keytag]
         id_to_im = {im["id"]: im for imd in imdata for im in imd["images"]}
 
         id_to_ann = {image_id: default_ann(image_id) for image_id in id_to_im.keys()}

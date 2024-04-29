@@ -41,7 +41,7 @@ training:
     iteration: 100004
     batch_size: 300
     # batch_size: 256
-    val_interval: 5000
+    val_interval: 500
     save_interval: 5000
     print_interval: 2500
     optimizer:

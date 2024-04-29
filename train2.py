@@ -84,11 +84,11 @@ def main():
     total_n_params = sum([p.numel() for p in model_fe.parameters()]) + \
                      sum([p.numel() for p in model_cls.parameters()])
 
-    d_list = []
-    if cfg['model'].get('discriminator', None):
-        model_d = get_model(cfg['model']['discriminator']).to(device)
-        params += [{'params': model_d.parameters(), 'lr': 10}]
-        d_list = [model_d]
+    # d_list = []
+    # if cfg['model'].get('discriminator', None):
+    #     model_d = get_model(cfg['model']['discriminator']).to(device)
+    #     params += [{'params': model_d.parameters(), 'lr': 10}]
+    #     d_list = [model_d]
 
     # setup loss criterion. Order and names should match in the trainer file and config file.
     loss_dict = cfg['training']['losses']
@@ -142,8 +142,8 @@ def main():
                     model_cls.load_state_dict(cvt2normal_state(checkpoint['model_cls_state']))
                     logger.info('Loading classifier')
 
-            if checkpoint.get('model_d_state', None):
-                model_d.load_state_dict((checkpoint['model_d_state']))
+            # if checkpoint.get('model_d_state', None):
+            #     model_d.load_state_dict((checkpoint['model_d_state']))
 
             if resume['param_only'] is False:
                 start_it = checkpoint['iteration']
@@ -163,16 +163,20 @@ def main():
         logger.info("Using multiple GPUs")
         model_fe = nn.DataParallel(model_fe, device_ids=range(n_gpu))
         model_cls = nn.DataParallel(model_cls, device_ids=range(n_gpu))
-
+    i = 0
+    batch_iterator = loop_iterable(data_loader_all)
+    # for it in range(start_it, cfg['training']['iteration']):
+    #     i+=1
+    #     print(i)
+    #     next(batch_iterator)
+    # print("i iss final ", i)
     for it in range(start_it, cfg['training']['iteration']):
 
         scheduler.step()
-        for batchid, all_data in enumerate(data_loader_all):
-            print(f"----------batch {batchid} @ epoch {it} ----------")
-            src_data = all_data['src_data']
-            tgt_data = all_data['tgt_data']
-            batch = (src_data, tgt_data)
-            trainer(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer)
+        # for batchid, all_data in enumerate(data_loader_all):
+        print(f"----------iteration {it} ----------")
+
+        trainer(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, writer)
 
         if (it + 1) % cfg['training']['val_interval'] == 0:
 
@@ -209,8 +213,7 @@ def main():
                 'best_acc_src': best_acc_src
             }
 
-            if len(d_list):
-                state['model_d_state'] = model_d.state_dict()
+            # if len(d_list):?l_d_state'] = model_d.state_dict()
 
             ckpt_path = os.path.join(logdir, 'checkpoint.pkl')
             save_path = ckpt_path  # .format(it=it+1)

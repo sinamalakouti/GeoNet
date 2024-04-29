@@ -39,7 +39,7 @@ def maximum_mean_discrepancies( x, y, kernel="multiscale"):
 
     return torch.mean(XX + YY - 2. * XY)
 
-def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
+def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, writer):
 
     # setting training mode
     model_fe.train()
@@ -47,7 +47,7 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
     opt.zero_grad()
 
     # get data
-    (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = batch
+    (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = next(batch_iterator)
     img_src, img_tgt, lbl_src, lbl_tgt = img_src.to(device), img_tgt.to(device), lbl_src.to(device), lbl_tgt.to(device)
 
     unique_cls_src = np.unique(lbl_src.to('cpu'))
