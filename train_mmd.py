@@ -11,7 +11,7 @@ import random
 import shutil
 import numpy as np
 import torch
-from torch import inverse, nn
+from torch import inverse, nn, Tensor
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 

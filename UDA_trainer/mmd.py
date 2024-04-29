@@ -60,6 +60,7 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
     # feature = torch.cat((imfeat_src, imfeat_tgt), dim=0)
     # output = torch.cat((output_src, output_tgt), dim=0)
     mmd_loss = 0
+    print("computing MMD")
     for cls in unique_cls_src:
         imfeat_src_filtered = imfeat_src[lbl_src==cls]
         imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
@@ -68,6 +69,8 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
             imfeat_tgt_filtered,
             kernel="multiscale"
         )
+
+    print("end MMD")
 
     criterion_cls = torch.nn.CrossEntropyLoss()
     mmd_loss_adjusted = (0.75 * mmd_loss)
