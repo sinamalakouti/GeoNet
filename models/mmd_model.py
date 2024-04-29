@@ -48,11 +48,11 @@ class BottleNeckFeatureExtractor(nn.Module):
         )
 
     def forward(self, x):
-        print("mfeature map start")
+        # print("mfeature map start")
         feature_map = self.feature_extractor(x)
         dense_representation = self.dense_layer(feature_map)
         shrinked_feature_map = self.bottle_neck(dense_representation)
-        print("feature map end")
+        # print("feature map end")
         return shrinked_feature_map
 
 
@@ -82,6 +82,6 @@ class MMDClassifer(nn.Module):
         )
 
     def forward(self, shrinked_feature_map):
-        print("clscslcsl")
+        # print("clscslcsl")
         output = self.classifier_head(shrinked_feature_map)
         return output
