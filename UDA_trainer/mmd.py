@@ -67,6 +67,7 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
     for cls in unique_cls_src:
         imfeat_src_filtered = imfeat_src[lbl_src==cls]
         imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
+
         mmd_loss += mmd_linear(imfeat_src_filtered, imfeat_tgt_filtered)
         # mmd_loss += maximum_mean_discrepancies(
         #     imfeat_src_filtered,
@@ -82,6 +83,9 @@ def train_mmd(batch, model_fe, model_cls, opt, it, device,cfg, logger, writer):
 
     # compute loss
     print("closs is", closs)
+    print("mmd loss: mm",  mmd_loss_adjusted)
+    print("mmd loss: 22222", mmd_loss)
+    print("mmd loss: 3333", mmd_loss.detach())
     loss = closs + mmd_loss_adjusted
     print("loss is ", loss.detach)
     # back propagation
