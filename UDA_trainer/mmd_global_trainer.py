@@ -39,7 +39,7 @@ def maximum_mean_discrepancies( x, y, kernel="multiscale"):
 
     return torch.mean(XX + YY - 2. * XY)
 
-def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, writer):
+def train_mmd_global(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, writer):
 
     # setting training mode
     model_fe.train()

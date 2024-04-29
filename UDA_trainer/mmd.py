@@ -46,8 +46,8 @@ def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, 
     model_cls.train()
     opt.zero_grad()
 
-    model_fe = model_fe.cuda()
-    model_cls = model_cls.cuda()
+    model_fe = model_fe.to(device)
+    model_cls = model_cls.to(device)
     # get data
     batch = next(batch_iterator)
     (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = batch['src_data'], batch['tgt_data']
@@ -98,7 +98,7 @@ def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, 
     curr_lr = opt.param_groups[0]['lr']
     if (it + 1) % cfg['training']['print_interval'] == 0:
         print_str = 'Iteration: [{0}/{1}]\t' \
-            'LR: [{curr_lr:.4g}]\t' \
+            'x: [{curr_lr:.4g}]\t' \
             'CLoss {closs:.4f}\t' \
             'mmdloss {mmd_loss:.4f}'.format(
                 it + 1, cfg['training']['iteration'], curr_lr=curr_lr,
