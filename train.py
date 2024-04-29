@@ -27,6 +27,7 @@ def main():
 
     # setup random seeds
     seed = cfg.get('seed', 1234)
+    print("hi")
     np.random.seed(seed)
     random.seed(seed)
     torch.manual_seed(seed)
