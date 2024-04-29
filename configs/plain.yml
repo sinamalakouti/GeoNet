@@ -33,9 +33,9 @@ training:
             name: cross_entropy
     iteration: 100004
     batch_size: 32
-    val_interval: 5000
-    save_interval: 10000
-    print_interval: 2500
+    val_interval: 200
+    save_interval: 200
+    print_interval: 200
     optimizer:
         name: sgd
         momentum: 0.9
