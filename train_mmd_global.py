@@ -200,7 +200,7 @@ def main():
 
 if __name__ == '__main__':
     global cfg, args, writer, logger, logdir
-    valid_trainers = ["plain", "cdan", "mmd"]
+    valid_trainers = ["plain", "cdan", "mmd", "mmd_global_trainer"]
 
     parser = argparse.ArgumentParser(description='config')
     parser.add_argument(
