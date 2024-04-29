@@ -43,7 +43,7 @@ def main():
     splits = ['train', 'test']
     data_loader_src = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
     data_loader_tgt = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-    batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
+    # batch_iterator = zip(loop_iterable(data_loader_src['train']), loop_iterable(data_loader_tgt['train']))
 
     n_classes = cfg["model"]["classifier"]["n_class"]
 
