@@ -168,7 +168,7 @@ def main():
 
         scheduler.step()
         for batchid, all_data in enumerate(data_loader_all):
-            print(f"----------batch {it} @ epoch {} ----------")
+            print(f"----------batch {batchid} @ epoch {it} ----------")
             src_data = all_data['src_data']
             tgt_data = all_data['tgt_data']
             batch = (src_data, tgt_data)
