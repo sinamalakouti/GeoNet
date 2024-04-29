@@ -39,7 +39,7 @@ training:
             use_entropy: false # true for CDAN+E; false for CDAN
             coeff: 1
     iteration: 100004
-    batch_size: 100
+    batch_size: 300
     # batch_size: 256
     val_interval: 5000
     save_interval: 5000

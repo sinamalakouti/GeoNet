@@ -53,7 +53,7 @@ def main():
     cfg['data']['target']['loader'] = 'JSONDataLoader'
     data_src_test = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
     data_tgt_test = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-    sampler = BalancedClassSampler(training_data, num_samples_per_class=20, batch_size=20)
+    sampler = BalancedClassSampler(training_data, num_samples_per_class=30, batch_size=300)
 
     # data_loader_src = DataLoader(data_src, batch_sampler=sampler)
     # data_loader_tgt = DataLoader(data_tgt, batch_sampler=sampler)
@@ -168,7 +168,7 @@ def main():
 
         scheduler.step()
         for batchid, all_data in enumerate(data_loader_all):
-            print(f"----------batch {it} @ epoch {batchid} ----------")
+            print(f"----------batch {it} @ epoch {} ----------")
             src_data = all_data['src_data']
             tgt_data = all_data['tgt_data']
             batch = (src_data, tgt_data)
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     parser.add_argument("--json_dir", type=str, help="Metadata Directory")
     parser.add_argument("--trainer", required=True, type=str.lower, choices=valid_trainers, help="Adaptation method.")
     parser.add_argument("--num_iter", type=int, default=100004, help="Total number of iterations")
-    parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
+    parser.add_argument("--batch_size", type=int, default=300, help="Batch size")
     parser.add_argument("--resume", help="Resume training from checkpoint")
     parser.add_argument("--exp_name", help="experiment name")
 
