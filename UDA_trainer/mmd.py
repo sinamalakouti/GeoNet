@@ -46,16 +46,18 @@ def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, 
     model_cls.train()
     opt.zero_grad()
 
+    model = model.cuda()
     # get data
-    (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = next(batch_iterator)
+    batch = next(batch_iterator)
+    (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = batch['src_data'], batch['tgt_data']
     img_src, img_tgt, lbl_src, lbl_tgt = img_src.to(device), img_tgt.to(device), lbl_src.to(device), lbl_tgt.to(device)
 
     unique_cls_src = np.unique(lbl_src.to('cpu'))
     unique_lbl_tgt = np.unique(lbl_tgt.to('cpu'))
     assert len(unique_cls_src) == len(unique_lbl_tgt), "labels unique don't match"
-    imfeat_src = model_fe(img_src)
-    imfeat_tgt =  model_fe(img_tgt)
-    output_src = model_cls(imfeat_src)
+    imfeat_src = model_fe(img_src.cuda())
+    imfeat_tgt =  model_fe(img_tgt.cuda())
+    output_src = model_cls(imfeat_src.cuda())
 
     # output_tgt = model_cls(imfeat_tgt)
     # output_src, imfeat_src = model_cls(model_fe(img_src))
