@@ -56,9 +56,9 @@ def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, 
     unique_cls_src = np.unique(lbl_src.to('cpu'))
     unique_lbl_tgt = np.unique(lbl_tgt.to('cpu'))
     assert len(unique_cls_src) == len(unique_lbl_tgt), "labels unique don't match"
-    imfeat_src = model_fe(img_src.cuda())
-    imfeat_tgt =  model_fe(img_tgt.cuda())
-    output_src = model_cls(imfeat_src.cuda())
+    imfeat_src = model_fe(img_src.to(device))
+    imfeat_tgt =  model_fe(img_tgt.to(device))
+    output_src = model_cls(imfeat_src.to(device))
 
     # output_tgt = model_cls(imfeat_tgt)
     # output_src, imfeat_src = model_cls(model_fe(img_src))
