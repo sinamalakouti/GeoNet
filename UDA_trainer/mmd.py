@@ -72,6 +72,7 @@ def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, 
         imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
 
         mmd_loss += mmd_linear(imfeat_src_filtered, imfeat_tgt_filtered)
+    mmd_loss /= len(unique_cls_src)
         # mmd_loss += maximum_mean_discrepancies(
         #     imfeat_src_filtered,
         #     imfeat_tgt_filtered,

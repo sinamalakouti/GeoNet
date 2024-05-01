@@ -30,7 +30,7 @@ def main():
     #     raise SystemExit('GPU is needed')
 
     # setup random seeds
-    seed = cfg.get('seed', 1234)
+    seed = cfg.get('seed', 12)#1234)
     np.random.seed(seed)
     random.seed(seed)
     torch.manual_seed(seed)
@@ -53,7 +53,7 @@ def main():
     cfg['data']['target']['loader'] = 'JSONDataLoader'
     data_src_test = get_dataloader(cfg['data']['source'], splits, cfg['training']['batch_size'])
     data_tgt_test = get_dataloader(cfg['data']['target'], splits, cfg['training']['batch_size'])
-    sampler = BalancedClassSampler(training_data, num_samples_per_class=2, batch_size=cfg['training']['batch_size'])
+    sampler = BalancedClassSampler(training_data, num_samples_per_class=8, batch_size=cfg['training']['batch_size'])
 
     # data_loader_src = DataLoader(data_src, batch_sampler=sampler)
     # data_loader_tgt = DataLoader(data_tgt, batch_sampler=sampler)
