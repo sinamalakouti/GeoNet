@@ -71,7 +71,7 @@ class MMDClassifer(nn.Module):
             self,
             dropout: float = .15,
             out_dim: int = 512,
-            num_classes: int = 600
+            num_classes: int = 150
     ) -> None:
         super().__init__()
 
