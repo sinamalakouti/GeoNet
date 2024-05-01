@@ -65,17 +65,17 @@ def train_mmd(batch_iterator, model_fe, model_cls, opt, it, device,cfg, logger, 
     # output_tgt, imfeat_tgt = model_cls(model_fe(img_tgt))
     # feature = torch.cat((imfeat_src, imfeat_tgt), dim=0)
     # output = torch.cat((output_src, output_tgt), dim=0)
-    # mmd_loss = 0
+    mmd_loss = 0
     # print("computing MMD")
     #
-    # for cls in unique_cls_src:
-    #     imfeat_src_filtered = imfeat_src[lbl_src==cls]
-    #     imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
-    #
-    #     mmd_loss += mmd_linear(imfeat_src_filtered, imfeat_tgt_filtered)
-    # mmd_loss /= len(unique_cls_src)
+    for cls in unique_cls_src:
+        imfeat_src_filtered = imfeat_src[lbl_src==cls]
+        imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
 
-    mmd_loss = mmd_linear(imfeat_src, imfeat_tgt)
+        mmd_loss += mmd_linear(imfeat_src_filtered, imfeat_tgt_filtered)
+    mmd_loss /= len(unique_cls_src)
+
+    # mmd_loss = mmd_linear(imfeat_src, imfeat_tgt)
         # mmd_loss += maximum_mean_discrepancies(
         #     imfeat_src_filtered,
         #     imfeat_tgt_filtered,
