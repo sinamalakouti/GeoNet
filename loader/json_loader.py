@@ -102,7 +102,8 @@ class ImageJSONLoader(data.Dataset):
             for s in split:
                 keytag.append("{}_{}".format(d, s))
         json_data = json.load(open(json_path))
-        json_data = self.filter_all_data_based_on_categories(json_data, self.top_150_asia)
+        # json_data = self.filter_all_data_based_on_categories(json_data, self.top_150_asia)
+        print("number of objects is ", len(json_data['categories']))
         self.return_ann = return_ann
         self.return_loc = return_loc
         self.return_meta = return_meta
