@@ -6,6 +6,36 @@ from utils import calc_coeff
 import torch.nn as nn
 
 
+class MB(autograd.Function):
+
+    @staticmethod
+    def forward(ctx, inputs, indexes, features, momentum):
+        ctx.features = features
+        ctx.momentum = momentum
+        ctx.save_for_backward(inputs, indexes)
+        outputs = inputs.mm(ctx.features.t())
+        return outputs
+
+    @staticmethod
+    def backward(ctx, grad_outputs):
+        inputs, indexes = ctx.saved_tensors
+        grad_inputs = None
+        if ctx.needs_input_grad[0]:
+            grad_inputs = grad_outputs.mm(ctx.features)
+
+        # momentum update
+        for x, y in zip(inputs, indexes):
+            ctx.features[y] = ctx.momentum * ctx.features[y] + (1. - ctx.momentum) * x
+            ctx.features[y] /= ctx.features[y].norm()
+
+        return grad_inputs, None, None, None
+
+
+def mb(inputs, indexes, features, momentum=0.5):
+    return MB.apply(inputs, indexes, features, torch.Tensor([momentum]).to(inputs.device))
+
+
+
 class MemoryBank(nn.Module):
     def __init__(self, num_features, num_classes, num_samples, momentum=0.9):
         super(MemoryBank, self).__init__()

@@ -31,7 +31,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
 
     unique_cls_src = np.unique(lbl_src.to('cpu'))
     unique_lbl_tgt = np.unique(lbl_tgt.to('cpu'))
-    assert len(unique_cls_src) == len(unique_lbl_tgt), "labels unique don't match"
+    # assert len(unique_cls_src) == len(unique_lbl_tgt), "labels unique don't match"
     imfeat_src = model_fe(img_src.to(device))
     imfeat_tgt = model_fe(img_tgt.to(device))
     output_src = model_cls(imfeat_src.to(device))
@@ -40,17 +40,21 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
     mmd_fn = MMDLoss()
     for cls in unique_cls_src:
         imfeat_src_filtered = imfeat_src[lbl_src == cls]
-        imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
+
         if len(imfeat_src_filtered) > 0:
             mmd_loss = mmd_loss + mmd_fn(imfeat_src_filtered, mb.features_tgt[cls])
             mb.features_src[cls] = mb.features_src[cls] * mb.momentum + imfeat_src_filtered.mean(dim=0) * (
                         1 - mb.momentum)
+    mmd_loss = mmd_loss / len(unique_cls_src)
+    for cls in unique_lbl_tgt:
+        imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
         if len(imfeat_tgt_filtered) > 0:
             mmd_loss = mmd_loss + mmd_fn(imfeat_tgt_filtered, mb.features_src[cls])
             mb.features_tgt[cls] = mb.features_tgt[cls] * mb.momentum + imfeat_tgt_filtered.mean(dim=0) * (
                         1 - mb.momentum)
+    mmd_loss = mmd_loss / len(unique_cls_src)
 
-    mmd_loss /= len(unique_cls_src)
+
 
     if iter <= 200:
         mmd_loss = 0
