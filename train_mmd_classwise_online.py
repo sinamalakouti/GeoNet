@@ -57,11 +57,11 @@ def main():
         device = 'cuda'
         n_gpu = torch.cuda.device_count()
 
-    model_fe = get_model(cfg['model']['feature_extractor']).cuda()
+    model_fe = get_model(cfg['model']['feature_extractor']).to(device)
     params = [{'params': model_fe.parameters(), 'lr': 1}]
     fe_list = [model_fe]
 
-    model_cls = get_model(cfg['model']['classifier']).cuda()
+    model_cls = get_model(cfg['model']['classifier']).to(device)
     params += [{'params': model_cls.parameters(), 'lr': 10}]
     cls_list = [model_cls]
 

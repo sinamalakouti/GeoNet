@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from torchgen.api import autograd
 
 from losses.loss import MMDLoss
 from utils import calc_coeff
@@ -10,10 +11,10 @@ class MB(autograd.Function):
 
     @staticmethod
     def forward(ctx, x, y, memory, momentum):
-        ctx.features = features
+        ctx.features = memory
         ctx.momentum = momentum
-        ctx.save_for_backward(inputs, indexes)
-        outputs = inputs.mm(ctx.features.t())
+        ctx.save_for_backward(x, y)
+        outputs = x.mm(ctx.features.t())
         return outputs
 
     @staticmethod

@@ -25,7 +25,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
     model_fe = model_fe.to(device)
     model_cls = model_cls.to(device)
     # get data
-    batch = next(batch_iterator)
+    # batch = next(batch_iterator)
     (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = next(batch_iterator)
     img_src, img_tgt, lbl_src, lbl_tgt = img_src.to(device), img_tgt.to(device), lbl_src.to(device), lbl_tgt.to(device)
 
@@ -37,7 +37,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
     output_src = model_cls(imfeat_src.to(device))
 
     mmd_loss = 0
-    mmd_fn = MMDLoss()
+    mmd_fn = MMDLoss(device)
     for cls in unique_cls_src:
         imfeat_src_filtered = imfeat_src[lbl_src == cls]
 

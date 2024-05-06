@@ -74,6 +74,8 @@ class EntropyLoss(nn.Module):
 
 
 class MMDLoss(nn.Module):
+    def __init__(self, device):
+        self.device = device
     def compute_paired_dist(self, A, B):
         bs_A = A.size(0)
         bs_T = B.size(0)
@@ -100,13 +102,13 @@ class MMDLoss(nn.Module):
         gamma_tensor = (torch.tensor(gamma_list)).to(self.device)
 
         eps = 1e-5
-        gamma_mask = (gamma_tensor < eps).type(torch.cuda.FloatTensor)
+        gamma_mask = (gamma_tensor < eps).type(float)
         gamma_tensor = (1.0 - gamma_mask) * gamma_tensor + gamma_mask * eps
         gamma_tensor = gamma_tensor.detach()
 
         dists = dists.unsqueeze(0) / gamma_tensor.view(-1, 1, 1)
-        upper_mask = (dists > 1e5).type(torch.cuda.FloatTensor).detach()
-        lower_mask = (dists < 1e-5).type(torch.cuda.FloatTensor).detach()
+        upper_mask = (dists > 1e5).type(float).detach()
+        lower_mask = (dists < 1e-5).type(float).detach()
         normal_mask = 1.0 - upper_mask - lower_mask
         dists = normal_mask * dists + upper_mask * 1e5 + lower_mask * 1e-5
         kernel_val = torch.sum(torch.exp(-1.0 * dists), dim=0)
