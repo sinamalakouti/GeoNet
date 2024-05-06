@@ -77,6 +77,9 @@ class MMDLoss(nn.Module):
     def __init__(self, device):
         self.device = device
     def compute_paired_dist(self, A, B):
+        A = A.to(self.device)
+        B = B.to(self.device)
+
         bs_A = A.size(0)
         bs_T = B.size(0)
         feat_len = A.size(1)
