@@ -46,7 +46,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
             mmd_loss = mmd_loss + mmd_fn.mmd(imfeat_src_filtered, mb.features_tgt[cls].unsqueeze(0))
             mb.features_src[cls] = mb.features_src[cls] * mb.momentum + imfeat_src_filtered.detach().mean(dim=0) * (
                         1 - mb.momentum)
-            mb.features_src[cls] = mb.features_src[cls].norm()
+            # mb.features_src[cls] = mb.features_src[cls].norm()
     mmd_loss = mmd_loss / len(unique_cls_src)
     for cls in unique_lbl_tgt:
         imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
@@ -54,7 +54,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
             mmd_loss = mmd_loss + mmd_fn.mmd(imfeat_tgt_filtered, mb.features_src[cls].unsqueeze(0))
             mb.features_tgt[cls] = mb.features_tgt[cls] * mb.momentum + imfeat_tgt_filtered.detach().mean(dim=0) * (
                         1 - mb.momentum)
-            mb.features_tgt[cls] = mb.features_tgt[cls].norm()
+            # mb.features_tgt[cls] = mb.features_tgt[cls].norm()
     mmd_loss = mmd_loss / len(unique_cls_src)
 
     if iter <= 200:
