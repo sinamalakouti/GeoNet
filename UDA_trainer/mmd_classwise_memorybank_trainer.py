@@ -43,8 +43,8 @@ class MemoryBank(nn.Module):
 
         self.momentum = momentum
 
-        self.register_buffer('features_src', torch.zeros(num_classes, num_features))
-        self.register_buffer('features_tgt', torch.zeros(num_classes, num_features))
+        self.register_buffer('features_src', torch.zeros(num_classes , num_samples, num_features))
+        self.register_buffer('features_tgt', torch.zeros(num_classes , num_samples, num_features))
 
 
 def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, opt, it, device, cfg, logger, writer):
