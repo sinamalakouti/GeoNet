@@ -40,7 +40,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
     mmd_loss = 0
     mmd_fn = MMDLoss(device)
 
-    mmd_loss = mmd_fn(imfeat_src,imfeat_tgt)
+    mmd_loss = mmd_fn.mmd(imfeat_src,imfeat_tgt)
     # for cls in unique_cls_src:
     #     imfeat_src_filtered = imfeat_src[lbl_src == cls]
     #
