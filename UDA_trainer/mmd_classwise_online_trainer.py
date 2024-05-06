@@ -21,6 +21,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
     model_fe.train()
     model_cls.train()
     opt.zero_grad()
+    mb.to(device)
 
     model_fe = model_fe.to(device)
     model_cls = model_cls.to(device)
