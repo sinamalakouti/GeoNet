@@ -16,7 +16,7 @@ data:
     source:
         loader: JSONDataLoader
         data_root: /data/
-        n_workers: 4
+        n_workers: 8
         drop_last: true
         ann: true
         loc: false
@@ -30,7 +30,7 @@ data:
         loc: false
         meta: false
 training:
-    trainer: mmd
+    trainer: mmd_classwise_online_trainer
     losses:
         loss_cls:
             name: cross_entropy

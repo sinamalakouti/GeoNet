@@ -24,13 +24,14 @@ data:
     target:
         loader: JSONDataLoader
         data_root: /data/
-        n_workers: 4
+        n_workers: 8
         drop_last: true
         ann: true ## UDA
         loc: false
         meta: false
 training:
-    trainer: mmd
+    trainer:  mmd_global_trainer
+
     losses:
         loss_cls:
             name: cross_entropy

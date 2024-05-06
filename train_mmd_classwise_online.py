@@ -10,7 +10,7 @@ from torch import inverse, nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from UDA_trainer.MMD_classWise_online import MemoryBank
+from UDA_trainer.mmd_classwise_online_trainer import MemoryBank
 from loader import get_dataloader
 from loader.joint_class_aware_loader import BalancedClassSampler
 from models import get_model
@@ -202,7 +202,7 @@ def main():
 
 if __name__ == '__main__':
     global cfg, args, writer, logger, logdir
-    valid_trainers = ["plain", "cdan", "mmd", "mmd_global_trainer"]
+    valid_trainers = ["plain", "cdan", "mmd", "mmd_global_trainer", "mmd_classwise_online_trainer"]
 
     parser = argparse.ArgumentParser(description='config')
     parser.add_argument(
