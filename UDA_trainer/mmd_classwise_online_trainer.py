@@ -58,7 +58,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
 
 
     if iter <= 200:
-        mmd_loss = 0
+        mmd_loss = mmd_loss * 0
 
     # mmd_loss = mmd_linear(imfeat_src, imfeat_tgt)
     # mmd_loss += maximum_mean_discrepancies(
