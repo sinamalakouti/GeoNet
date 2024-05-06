@@ -9,7 +9,7 @@ import torch.nn as nn
 class MB(autograd.Function):
 
     @staticmethod
-    def forward(ctx, inputs, indexes, features, momentum):
+    def forward(ctx, x, y, memory, momentum):
         ctx.features = features
         ctx.momentum = momentum
         ctx.save_for_backward(inputs, indexes)
