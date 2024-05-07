@@ -219,12 +219,12 @@ class ImageJSONLoader(data.Dataset):
         if self.return_meta:
             return_obj.append(metadata)
 
+        return_obj.append(index)
+
         return return_obj
 
     def __getitem__(self, index):
         # print("getitem  ",index)
-
-
         if isinstance(index, list) and len(index) > 0:
             batch = []
             for ind in index:

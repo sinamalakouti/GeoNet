@@ -74,11 +74,11 @@ def main():
 
 
     model_fe = get_model(cfg['model']['feature_extractor']).to(device)
-    params = [{'params': model_fe.parameters(), 'lr': 1}]
+    params = [{'params': model_fe.parameters(), 'lr': 10}]
     fe_list = [model_fe]
 
     model_cls = get_model(cfg['model']['classifier']).to(device)
-    params += [{'params': model_cls.parameters(), 'lr': 10}]
+    params += [{'params': model_cls.parameters(), 'lr': 20}]
     cls_list = [model_cls]
 
     total_n_params = sum([p.numel() for p in model_fe.parameters()]) + \
