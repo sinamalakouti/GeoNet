@@ -35,7 +35,6 @@ class CLIP_baseline(nn.Module):
         super().__init__()
         clip_model, preprocess = clip.load("RN50", device=device)
         self.visual = clip_model.visual
-        self.visual = clip_model.visual
         self.device = device
         self.dim = 2048
         self.w = 7
@@ -99,7 +98,7 @@ class CLIP_baseline(nn.Module):
         x = x.to(self.device)
         labels = labels.to(self.device)
         # text_features = self.text_features
-        img_feautes = self.clipImageEncoder(x)
+        img_feautes = self.visual(x)
         # final_img_feautres = img_feautes.reshape(img_feautes.shape[0], img_feautes.shape[-1], self.w, self.h)
 
         # final_img_feautres = self.clipImageEncoder.apply_pooling(final_img_feautres)
