@@ -34,7 +34,7 @@ CUSTOM_TEMPLATES = {
 
 class CLIP_baseline(nn.Module):
     def __init__(self, cfg, device, classnames):
-        super().__init__()
+        super(CLIP_baseline, self).__init__()
         # clip_model, preprocess = clip.load("RN50", device=device)
         # self.visual = clip_model.visual
         self.visual = models.resnet50()
@@ -102,7 +102,6 @@ class CLIP_baseline(nn.Module):
         x = x.to(self.device)
         labels = labels.to(self.device)
         # text_features = self.text_features
-        print("x decice ", x.device)
         self.visual =  self.visual.to(self.device)
         # print("model device; ", self.visual.device)
         img_feautes = self.visual(x)

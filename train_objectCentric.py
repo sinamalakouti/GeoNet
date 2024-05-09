@@ -14,6 +14,7 @@ from UDA_trainer.val import val_clip
 from loader import get_dataloader
 from loader.joint_class_aware_loader import BalancedClassSampler
 from models import get_model
+from models.baseline import Baseline
 from models.clip_baseline import CLIP_baseline
 from models.objectCentric import ObjectCentric
 from optimizers import get_optimizer, get_scheduler
@@ -60,7 +61,8 @@ def main():
         n_gpu = torch.cuda.device_count()
 
     # model = ObjectCentric(cfg, device, list(data_loader_src['train'].dataset.id_to_classname.values()))
-    model = CLIP_baseline(cfg, device, list(data_loader_src['train'].dataset.id_to_classname.values()))
+    # model = CLIP_baseline(cfg, device, list(data_loader_src['train'].dataset.id_to_classname.values()))
+    model = Baseline()
     loss_dict = cfg['training']['losses']
     criterion_list = []
     for loss_name, loss_params in loss_dict.items():
@@ -72,7 +74,7 @@ def main():
     #     {'params': model.parameters(), 'lr':1e-7, 'weight_decay': 1e-2}
     # ], betas=(0.9, 0.98), eps=1e-6)
 
-    opt = optim.Adam(model.parameters(), lr=5e-5,betas=(0.9,0.98),eps=1e-6,weight_decay=0.2) #Params used from paper, the lr is smaller, more safe for fine tuning to new dataset
+    # opt = optim.Adam(model.parameters(), lr=5e-5,betas=(0.9,0.98),eps=1e-6,weight_decay=0.2) #Params used from paper, the lr is smaller, more safe for fine tuning to new dataset
 
     opt = optim.SGD(model.parameters(), lr=0.01)
 
@@ -83,9 +85,9 @@ def main():
 
     # if checkpoint already present, resume from checkpoint.
     resume_from_ckpt = False
-    if os.path.exists(os.path.join(logdir, 'checkpoint.pkl')):
-        cfg['training']['resume']['model'] = os.path.join(logdir, 'checkpoint.pkl')
-        resume_from_ckpt = True
+    # if os.path.exists(os.path.join(logdir, 'checkpoint.pkl')):
+    #     cfg['training']['resume']['model'] = os.path.join(logdir, 'checkpoint.pkl')
+    #     resume_from_ckpt = True
 
     # load checkpoint
     start_it = 0
@@ -134,7 +136,10 @@ def main():
     #         logger.info("No checkpoint found at '{}'".format(resume_model))
 
     logger.info('Start training from iteration {}'.format(start_it))
-
+    model = Baseline()
+    opt = optim.SGD(model.parameters(), lr=0.01)
+    scheduler = get_scheduler(opt, cfg['training']['scheduler'])
+    
     if n_gpu > 1 and device == 'cuda':
         logger.info("Using multiple GPUs")
         model = nn.DataParallel(model, device_ids=range(n_gpu))
