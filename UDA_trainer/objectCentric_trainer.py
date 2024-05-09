@@ -23,6 +23,7 @@ def train_objectCentric_trainer(batch_iterator, model, opt, it, device, cfg, log
     loss = closs
     # print("loss is ", loss.detach())
     # back propagation
+    print("backprop")
     loss.backward()
     opt.step()
 
