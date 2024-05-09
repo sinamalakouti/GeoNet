@@ -8,6 +8,7 @@ from utils import calc_coeff
 def train_objectCentric_trainer(batch_iterator, model, opt, it, device, cfg, logger, writer):
     # setting training mode
     model.train()
+    model = model.to(device)
     opt.zero_grad()
 
     # get data
