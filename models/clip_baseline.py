@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-# import clip
+import clip
 import numpy as np
 from models.clip_model.clip_model import ClipImageModel, ClipTextModel
 from models.slotAttention import SlotAttention
@@ -35,10 +35,10 @@ CUSTOM_TEMPLATES = {
 class CLIP_baseline(nn.Module):
     def __init__(self, cfg, device, classnames):
         super(CLIP_baseline, self).__init__()
-        # clip_model, preprocess = clip.load("RN50", device=device)
-        # self.visual = clip_model.visual
-        self.visual = models.resnet50()
-        self.visual.fc = nn.Identity()
+        clip_model, preprocess = clip.load("RN50", device=device)
+        self.visual = clip_model.visual
+        # self.visual = models.resnet50()
+        # self.visual.fc = nn.Identity()
         self.device = device
         self.dim = 2048
         self.w = 7
