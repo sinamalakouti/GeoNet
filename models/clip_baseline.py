@@ -98,35 +98,10 @@ class CLIP_baseline(nn.Module):
         total_loss = (loss_img(logits_per_image, labels)) #/ 2
         return total_loss
 
-    def forward(self, x, labels):
-        x = x.to(self.device)
-        labels = labels.to(self.device)
-        # text_features = self.text_features
-        self.visual =  self.visual.to(self.device)
-        # print("model device; ", self.visual.device)
+    def forward(self, x, labels=None):
+        x = x.cuda()
         img_feautes = self.visual(x)
-        # final_img_feautres = img_feautes.reshape(img_feautes.shape[0], img_feautes.shape[-1], self.w, self.h)
-
-        # final_img_feautres = self.clipImageEncoder.apply_pooling(final_img_feautres)
-
-        img_feautes = img_feautes / img_feautes.norm(dim=-1, keepdim=True)
-        # text_features /= text_features.norm(dim=-1, keepdim=True)
-
-        if self.training:
-            # logit_scale = self.logit_scale.exp()
-            # logits_per_image = logit_scale * final_img_feautres @ text_features.t()
-            # logits_per_text = logits_per_image.t()
-            cls_scores = self.cls_score(img_feautes.float())
-            ce_loss_fn = nn.CrossEntropyLoss()
-            loss = ce_loss_fn(cls_scores, labels)
-            return img_feautes, None, loss
-        else:
-            cls_scores = self.cls_score(img_feautes)
-            ce_loss_fn = nn.CrossEntropyLoss()
-            loss = ce_loss_fn(cls_scores, labels)
-            # logits_per_text = logits_per_image.t()
-            # loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
-            return img_feautes, None, loss
-
-
+        output = self.cls_score(img_feautes)
+        ce_loss_fn = nn.CrossEntropyLoss()
+        return output
 
