@@ -16,6 +16,7 @@ def train_objectCentric_trainer(batch_iterator, model, opt, it, device, cfg, log
     img_src, img_tgt, lbl_src, lbl_tgt = img_src.to(device), img_tgt.to(device), lbl_src.to(device), lbl_tgt.to(device)
 
     # image_logits, text_logits, closs = model(img_src.to(device), lbl_src.to(device))
+    print(type(model))
     logits = model(img_src, lbl_src)
     ce_loss = torch.nn.CrossEntropyLoss()
     closs =ce_loss(logits, lbl_src)
