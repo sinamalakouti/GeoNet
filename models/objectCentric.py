@@ -36,7 +36,7 @@ class ObjectCentric(nn.Module):
         clip_model, preprocess = clip.load("RN50", device=device)
         self.visual = clip_model.visual
         self.clipImageEncoder = ClipImageModel(model_type="RN50", remove_pooling=True)
-        clipTextEncoder = ClipTextModel(model_type="RN50", freeze_model=True)
+        self.clipTextEncoder = ClipTextModel(model_type="RN50", freeze_model=True)
         self.device = device
         self.dim = 2048
         self.w = 7
@@ -53,7 +53,7 @@ class ObjectCentric(nn.Module):
         self.all_class_prompts = self.get_class_prompts(classnames)
         with torch.no_grad():
             prompts = clip.tokenize(self.all_class_prompts).to(self.device)
-            self.text_features = clipTextEncoder(prompts)
+            self.text_features = self.clipTextEncoder(prompts)
 
     # def gen_contrastive_prompts(self, classnames, prompt_prefix, llm_descriptions,
     #                             countries_name=['usa', 'asia'], clip_model=None):
