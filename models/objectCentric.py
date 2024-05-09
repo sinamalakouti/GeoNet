@@ -111,7 +111,7 @@ class ObjectCentric(nn.Module):
     def forward(self, x, labels):
         x = x.to(self.device)
         labels = labels.to(self.device)
-        text_features = self.text_features
+        # text_features = self.text_features
         img_feautes, image_pos = self.clipImageEncoder(x)
         # x_pos = self.softpos(img_feautes, image_pos)
         # slots, attn = self.slot_attention(x_pos,  img_feautes)
@@ -128,7 +128,7 @@ class ObjectCentric(nn.Module):
             # loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
             return final_img_feautres, None, loss
         else:
-            logits_per_image = self.logit_scale * final_img_feautres @ text_features.t()
+            logits_per_image = self.logit_scale * final_img_feautres @ self.cls_score.weight.t()
             logits_per_text = logits_per_image.t()
             loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
             return logits_per_image, logits_per_text, loss
