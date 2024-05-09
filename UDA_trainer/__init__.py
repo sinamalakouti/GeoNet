@@ -7,6 +7,7 @@ from .cdan import train_cdan
 from .mmd import train_mmd
 from .mmd_classwise_online_trainer import train_mmd_classWise_online
 from .mmd_global_trainer import train_mmd_global
+from .objectCentric_trainer import train_objectCentric_trainer
 from .plain import train_plain
 from .dann import train_dann
 from .val import val
@@ -25,7 +26,8 @@ def _get_trainer_instance(name):
             'dann' : train_dann,
             'mmd' : train_mmd,
             'mmd_global_trainer': train_mmd_global,
-            'mmd_classwise_online_trainer': train_mmd_classWise_online
+            'mmd_classwise_online_trainer': train_mmd_classWise_online,
+            "object_centric_trainer": train_objectCentric_trainer
         }[name]
     except:
         raise BaseException('Trainer type {} not available'.format(name))

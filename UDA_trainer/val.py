@@ -2,6 +2,52 @@ import torch
 from metrics import averageMeter, accuracy, percls_accuracy
 from collections.abc import Iterable
 
+@torch.no_grad()
+def val_clip(data_loader, model, it, n_classes, logger, writer):
+    # setup average meters
+    losses = averageMeter()
+    top1 = averageMeter()
+    top5 = averageMeter()
+
+    # setting training mode
+    model.eval()
+
+
+    all_preds = []
+    all_labels = []
+    cls_num_list_tgt = []
+    len_dl = len(data_loader)
+
+    for (step, value) in enumerate(data_loader):
+
+        image = value[1].cuda()
+        target = value[2].cuda(non_blocking=True)
+
+        # forward
+        image_logits, text_logits, val_loss = model(image,target)
+        output = image_logits.softmax(dim=-1).cpu().numpy()
+
+        # measure accuracy
+        k = min(n_classes - 1, 5)
+        prec1, prec5 = accuracy(output, target, topk=(1, k))
+        top1.update(prec1, image.size(0))
+        top5.update(prec5, image.size(0))
+
+        # per class accuracy metrics
+        all_preds.extend(output.argmax(1).cpu().numpy().tolist())
+        all_labels.extend(target.cpu().numpy().tolist())
+
+    classwise_accuracy = percls_accuracy(all_preds, all_labels)
+
+    logger.info('[Val] Iteration {it}\tTop 1 Acc {top1.avg:.3f}\tTop 5 Acc. {top5.avg:.3f}'.format(it=it + 1, top1=top1,
+                                                                                                   top5=top5))
+
+    # setting training mode
+    model.train()
+
+    return top1.avg, top5.avg
+
+
 
 def val(data_loader, model_fe, model_cls, it, n_classes, logger, writer):
     # setup average meters

@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from torchgen.api import autograd
+from torch import autograd
 
 from losses.loss import MMDLoss
 from utils import calc_coeff
@@ -32,22 +32,49 @@ class MB(autograd.Function):
         return grad_inputs, None, None, None
 
 
+class MB(autograd.Function):
+
+    @staticmethod
+    def forward(ctx, inputs, indexes, features, momentum):
+        ctx.features = features
+        ctx.momentum = momentum
+        ctx.save_for_backward(inputs, indexes)
+        outputs = inputs.mm(ctx.features.t())
+        return outputs
+
+    @staticmethod
+    def backward(ctx, grad_outputs):
+        inputs, indexes = ctx.saved_tensors
+        grad_inputs = None
+        if ctx.needs_input_grad[0]:
+            grad_inputs = grad_outputs.mm(ctx.features)
+
+        # momentum update
+        for x, y in zip(inputs, indexes):
+            ctx.features[y] = ctx.momentum * ctx.features[y] + (1. - ctx.momentum) * x
+            ctx.features[y] /= ctx.features[y].norm()
+
+        return grad_inputs, None, None, None
+
+
 def mb(inputs, indexes, features, momentum=0.5):
     return MB.apply(inputs, indexes, features, torch.Tensor([momentum]).to(inputs.device))
 
 
-
 class MemoryBank(nn.Module):
-    def __init__(self, num_features, num_classes, num_samples, momentum=0.9):
+    def __init__(self, num_features, num_samples, momentum=0.9):
         super(MemoryBank, self).__init__()
 
         self.momentum = momentum
 
-        self.register_buffer('features_src', torch.zeros(num_classes , num_samples, num_features))
-        self.register_buffer('features_tgt', torch.zeros(num_classes , num_samples, num_features))
+        self.register_buffer('features_src', torch.zeros(num_samples[0],num_features))
+        self.register_buffer('labels_src', torch.zeros( num_samples[0]))
+        self.register_buffer('labels_tgt', torch.zeros(num_samples[1]))
+
+        self.register_buffer('features_tgt', torch.zeros(num_samples[1], num_features))
 
 
-def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, opt, it, device, cfg, logger, writer):
+def train_mmd_classWise_MemBank_online(iter, memory, batch_iterator, model_fe, model_cls, opt, it, device, cfg, logger, writer):
     # setting training mode
     model_fe.train()
     model_cls.train()
@@ -57,7 +84,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
     model_cls = model_cls.to(device)
     # get data
     batch = next(batch_iterator)
-    (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = batch['src_data'], batch['tgt_data']
+    (_, img_src, lbl_src, src_idx), (_, img_tgt, lbl_tgt,tgt_idx) = batch['src_data'], batch['tgt_data']
     img_src, img_tgt, lbl_src, lbl_tgt = img_src.to(device), img_tgt.to(device), lbl_src.to(device), lbl_tgt.to(device)
 
     unique_cls_src = np.unique(lbl_src.to('cpu'))
@@ -73,13 +100,13 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
         imfeat_src_filtered = imfeat_src[lbl_src == cls]
         imfeat_tgt_filtered = imfeat_tgt[lbl_tgt == cls]
         if len(imfeat_src_filtered) > 0:
-            mmd_loss = mmd_loss + mmd_fn(imfeat_src_filtered, mb.features_tgt[cls])
-            mb.features_src[cls] = mb.features_src[cls] * mb.momentum + imfeat_src_filtered.mean(dim=0) * (
-                        1 - mb.momentum)
+            mmd_loss = mmd_loss + mmd_fn(imfeat_src_filtered, memory.features_tgt[cls])
+            memory.features_src[cls] = memory.features_src[cls] * memory.momentum + imfeat_src_filtered.mean(dim=0) * (
+                        1 - memory.momentum)
         if len(imfeat_tgt_filtered) > 0:
-            mmd_loss = mmd_loss + mmd_fn(imfeat_tgt_filtered, mb.features_src[cls])
-            mb.features_tgt[cls] = mb.features_tgt[cls] * mb.momentum + imfeat_tgt_filtered.mean(dim=0) * (
-                        1 - mb.momentum)
+            mmd_loss = mmd_loss + mmd_fn(imfeat_tgt_filtered, memory.features_src[cls])
+            memory.features_tgt[cls] = memory.features_tgt[cls] * memory.momentum + imfeat_tgt_filtered.mean(dim=0) * (
+                        1 - memory.momentum)
 
     mmd_loss /= len(unique_cls_src)
 

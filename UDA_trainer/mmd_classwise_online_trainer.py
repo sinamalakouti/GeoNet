@@ -27,7 +27,7 @@ def train_mmd_classWise_online(iter, mb, batch_iterator, model_fe, model_cls, op
     model_cls = model_cls.to(device)
     # get data
     # batch = next(batch_iterator)
-    (_, img_src, lbl_src), (_, img_tgt, lbl_tgt) = next(batch_iterator)
+    (_, img_src, lbl_src, src_idx), (_, img_tgt, lbl_tgt,tgt_idx) = next(batch_iterator)
     img_src, img_tgt, lbl_src, lbl_tgt = img_src.to(device), img_tgt.to(device), lbl_src.to(device), lbl_tgt.to(device)
 
     unique_cls_src = np.unique(lbl_src.to('cpu'))
