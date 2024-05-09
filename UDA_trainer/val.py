@@ -25,7 +25,7 @@ def val_clip(data_loader, model, it, n_classes, logger, writer):
 
         # forward
         image_logits, text_logits, val_loss = model(image,target)
-        output = image_logits.softmax(dim=-1).cpu().numpy()
+        output = image_logits.softmax(dim=-1).cpu()#.numpy()
 
         # measure accuracy
         k = min(n_classes - 1, 5)
