@@ -139,7 +139,7 @@ def main():
     model = Baseline()
     opt = optim.SGD(model.parameters(), lr=0.01)
     scheduler = get_scheduler(opt, cfg['training']['scheduler'])
-    
+
     if n_gpu > 1 and device == 'cuda':
         logger.info("Using multiple GPUs")
         model = nn.DataParallel(model, device_ids=range(n_gpu))
