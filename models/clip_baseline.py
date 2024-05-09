@@ -101,7 +101,7 @@ class CLIP_baseline(nn.Module):
 
     def forward(self, x, labels=None):
         x = x.cuda()
-        img_feautes = self.visual(x)
+        img_feautes = self.visual(x).float()
         output = self.cls_score(img_feautes)
         ce_loss_fn = nn.CrossEntropyLoss()
         return output
