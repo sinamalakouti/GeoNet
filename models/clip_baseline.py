@@ -30,13 +30,12 @@ CUSTOM_TEMPLATES = {
 }
 
 
-class ObjectCentric(nn.Module):
+class CLIP_baseline(nn.Module):
     def __init__(self, cfg, device, classnames):
         super().__init__()
         clip_model, preprocess = clip.load("RN50", device=device)
         self.visual = clip_model.visual
-        self.clipImageEncoder = ClipImageModel(model_type="RN50", remove_pooling=True)
-        self.clipTextEncoder = ClipTextModel(model_type="RN50", freeze_model=True)
+        self.visual = clip_model.visual
         self.device = device
         self.dim = 2048
         self.w = 7
@@ -44,9 +43,10 @@ class ObjectCentric(nn.Module):
         self.hidden_dim = self.dim
         self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
         self.all_class_prompts = self.get_class_prompts(classnames)
-        with torch.no_grad():
-            prompts = clip.tokenize(self.all_class_prompts).to(self.device)
-            self.text_features = self.clipTextEncoder(prompts)
+        self.cls_score = nn.Linear(self.dim//2, len(self.all_class_prompts), bias=False)
+        # with torch.no_grad():
+        #     prompts = clip.tokenize(self.all_class_prompts).to(self.device)
+        #     self.text_features = self.clipTextEncoder(prompts)
 
     # def gen_contrastive_prompts(self, classnames, prompt_prefix, llm_descriptions,
     #                             countries_name=['usa', 'asia'], clip_model=None):
@@ -66,7 +66,7 @@ class ObjectCentric(nn.Module):
     #             DG_DS_prompts[country].append(norm_avg_cls_embed.cpu())
     #     return DG_DS_prompts
     def get_class_prompts(self, class_names, dataset_name='Geonet'):
-        prompts = [CUSTOM_TEMPLATES[dataset_name].format(cls) for cls in class_names]
+        prompts = [CUSTOM_TEMPLATES[dataset_name].format(cls.replace("_", " ")) for cls in class_names]
         return prompts
 
     # def get_llm_prompt_embedding(self):
@@ -98,26 +98,30 @@ class ObjectCentric(nn.Module):
     def forward(self, x, labels):
         x = x.to(self.device)
         labels = labels.to(self.device)
-        text_features = self.text_features
-        img_feautes, image_pos = self.clipImageEncoder(x)
-        final_img_feautres = img_feautes.reshape(img_feautes.shape[0], img_feautes.shape[-1], self.w, self.h)
+        # text_features = self.text_features
+        img_feautes = self.clipImageEncoder(x)
+        # final_img_feautres = img_feautes.reshape(img_feautes.shape[0], img_feautes.shape[-1], self.w, self.h)
 
-        final_img_feautres = self.clipImageEncoder.apply_pooling(final_img_feautres)
+        # final_img_feautres = self.clipImageEncoder.apply_pooling(final_img_feautres)
 
-        final_img_feautres /= final_img_feautres.norm(dim=-1, keepdim=True)
-        text_features /= text_features.norm(dim=-1, keepdim=True)
+        img_feautes /= img_feautes.norm(dim=-1, keepdim=True)
+        # text_features /= text_features.norm(dim=-1, keepdim=True)
 
         if self.training:
-            logit_scale = self.logit_scale.exp()
-            logits_per_image = logit_scale * final_img_feautres @ text_features.t()
-            logits_per_text = logits_per_image.t()
-            loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
-            return logits_per_image, logits_per_text, loss
+            # logit_scale = self.logit_scale.exp()
+            # logits_per_image = logit_scale * final_img_feautres @ text_features.t()
+            # logits_per_text = logits_per_image.t()
+            cls_scores = self.cls_score(img_feautes)
+            ce_loss_fn = nn.CrossEntropyLoss()
+            loss = ce_loss_fn(cls_scores, labels)
+            return img_feautes, None, loss
         else:
-            logits_per_image = self.logit_scale * final_img_feautres @ text_features.t()
-            logits_per_text = logits_per_image.t()
-            loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
-            return logits_per_image, logits_per_text, loss
+            cls_scores = self.cls_score(img_feautes)
+            ce_loss_fn = nn.CrossEntropyLoss()
+            loss = ce_loss_fn(cls_scores, labels)
+            # logits_per_text = logits_per_image.t()
+            # loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
+            return img_feautes, None, loss
 
 
 

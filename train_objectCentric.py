@@ -14,6 +14,7 @@ from UDA_trainer.val import val_clip
 from loader import get_dataloader
 from loader.joint_class_aware_loader import BalancedClassSampler
 from models import get_model
+from models.clip_baseline import CLIP_baseline
 from models.objectCentric import ObjectCentric
 from optimizers import get_optimizer, get_scheduler
 from UDA_trainer import get_trainer, val
@@ -58,8 +59,8 @@ def main():
         device = 'cuda'
         n_gpu = torch.cuda.device_count()
 
-    model = ObjectCentric(cfg, device, list(data_loader_src['train'].dataset.id_to_classname.values()))
-
+    # model = ObjectCentric(cfg, device, list(data_loader_src['train'].dataset.id_to_classname.values()))
+    model = CLIP_baseline(cfg, device, list(data_loader_src['train'].dataset.id_to_classname.values()))
     loss_dict = cfg['training']['losses']
     criterion_list = []
     for loss_name, loss_params in loss_dict.items():
