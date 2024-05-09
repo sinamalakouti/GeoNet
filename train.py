@@ -9,6 +9,7 @@ import torch
 from torch import inverse, nn
 import torch.nn.functional as F
 
+import models
 from loader import get_dataloader
 from models import get_model
 from optimizers import get_optimizer, get_scheduler
@@ -45,7 +46,8 @@ def main():
 
     # setup model (feature extractor(s) + classifier(s) + discriminator)
     n_gpu = torch.cuda.device_count()
-    model_fe = get_model(cfg['model']['feature_extractor']).cuda()
+    import torchvision.models
+    model_fe = models.resnet50() #get_model(cfg['model']['feature_extractor']).cuda()
     params = [{'params': model_fe.parameters(), 'lr': 1}]
     fe_list = [model_fe]
 
