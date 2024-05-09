@@ -101,7 +101,7 @@ def main():
             checkpoint = torch.load(resume_model)
 
             if resume_from_ckpt:
-                load_dict = checkpoint["model_fe_state"]
+                load_dict = checkpoint["model_state"]
 
             try:
                 model.load_state_dict(load_dict)
@@ -112,6 +112,7 @@ def main():
             ## TODO: add loading additional feature extractors and classifiers
             if resume.get('load_cls', True):
                 try:
+                    print("noooo loading cls")
                     model.load_state_dict((checkpoint['model_cls_state']))
                     logger.info('Loading classifier')
                 except:
@@ -137,8 +138,8 @@ def main():
 
     if n_gpu > 1 and device == 'cuda':
         logger.info("Using multiple GPUs")
-        model_fe = nn.DataParallel(model, device_ids=range(n_gpu))
-        model_cls = nn.DataParallel(model, device_ids=range(n_gpu))
+        model = nn.DataParallel(model, device_ids=range(n_gpu))
+        model = nn.DataParallel(model, device_ids=range(n_gpu))
 
     for it in range(start_it, cfg['training']['iteration']):
 
@@ -175,8 +176,7 @@ def main():
             ## TODO: add saving additional feature extractors and classifiers
             state = {
                 'iteration': it + 1,
-                'model_fe_state': model_fe.state_dict(),
-                'model_cls_state': model_cls.state_dict(),
+                'model_state': model.state_dict(),
                 'opt_main_state': opt.state_dict(),
                 'scheduler_state': scheduler.state_dict(),
                 'best_acc_tgt': best_acc_tgt,
