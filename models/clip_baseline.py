@@ -102,6 +102,8 @@ class CLIP_baseline(nn.Module):
         x = x.to(self.device)
         labels = labels.to(self.device)
         # text_features = self.text_features
+        print("x decice ", x.device)
+        print("model device; ", self.visual.device)
         img_feautes = self.visual(x)
         # final_img_feautres = img_feautes.reshape(img_feautes.shape[0], img_feautes.shape[-1], self.w, self.h)
 
