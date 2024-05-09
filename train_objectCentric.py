@@ -68,9 +68,12 @@ def main():
 
     # setup optimizer
 
-    opt = optim.AdamW([
-        {'params': model.parameters(), 'lr':1e-7, 'weight_decay': 1e-2}
-    ], betas=(0.9, 0.98), eps=1e-6)
+    # opt = optim.AdamW([
+    #     {'params': model.parameters(), 'lr':1e-7, 'weight_decay': 1e-2}
+    # ], betas=(0.9, 0.98), eps=1e-6)
+
+    opt = optim.Adam(model.parameters(), lr=5e-5,betas=(0.9,0.98),eps=1e-6,weight_decay=0.2) #Params used from paper, the lr is smaller, more safe for fine tuning to new dataset
+
 
 
     # setup scheduler
