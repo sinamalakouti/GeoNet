@@ -103,7 +103,7 @@ class CLIP_baseline(nn.Module):
 
         # final_img_feautres = self.clipImageEncoder.apply_pooling(final_img_feautres)
 
-        img_feautes /= img_feautes.norm(dim=-1, keepdim=True)
+        img_feautes = img_feautes / img_feautes.norm(dim=-1, keepdim=True)
         # text_features /= text_features.norm(dim=-1, keepdim=True)
 
         if self.training:
