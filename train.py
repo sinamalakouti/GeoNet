@@ -53,7 +53,7 @@ def main():
     model_fe = model_fe.cuda()
     # model_cls = get_model(cfg['model']['classifier']).cuda()
 
-    model_fe = nn.Linear(2048, 150)
+    model_fe.fc = nn.Linear(2048, 150)
     params = [{'params': model_fe.parameters(), 'lr': 1}]
     fe_list = [model_fe]
 
