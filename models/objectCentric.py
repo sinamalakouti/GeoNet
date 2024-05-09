@@ -5,7 +5,7 @@ import numpy as np
 from models.clip_model.clip_model import ClipImageModel, ClipTextModel
 from models.slotAttention import SlotAttention
 from models.utils import SoftPositionEmbed
-
+from torch.nn import functional as F
 CUSTOM_TEMPLATES = {
     "OxfordPets": "a photo of a {}, a type of pet.",
     "OxfordFlowers": "a photo of a {}, a type of flower.",
@@ -36,7 +36,7 @@ class ObjectCentric(nn.Module):
         clip_model, preprocess = clip.load("RN50", device=device)
         self.visual = clip_model.visual
         self.clipImageEncoder = ClipImageModel(model_type="RN50", remove_pooling=True)
-        self.clipTextEncoder = ClipTextModel(model_type="RN50", freeze_model=True)
+        clipTextEncoder = ClipTextModel(model_type="RN50", freeze_model=True)
         self.device = device
         self.dim = 2048
         self.w = 7
@@ -51,12 +51,15 @@ class ObjectCentric(nn.Module):
         )
         self.slot_attention = SlotAttention(self.dim, self.dim, ff_mlp=self.mlp)
         self.all_class_prompts = self.get_class_prompts(classnames)
+        self.cls_score = nn.Linear(self.dim//2, len(self.all_class_prompts), bias=False)
         with torch.no_grad():
             prompts = clip.tokenize(self.all_class_prompts).to(self.device)
             # print("our device is  ", device)
             # print("prompt device is ", prompts)
             # print("clip text encoder device is : ", self.clipTextEncoder.device)
-            self.text_features = self.clipTextEncoder.to(device)(prompts)
+            text_features = clipTextEncoder.to(device)(prompts)
+            self.cls_score.weight.copy_(text_features)
+            self.cls_score.requires_grad_(False)
 
     # def gen_contrastive_prompts(self, classnames, prompt_prefix, llm_descriptions,
     #                             countries_name=['usa', 'asia'], clip_model=None):
@@ -117,14 +120,13 @@ class ObjectCentric(nn.Module):
         final_img_feautres = self.clipImageEncoder.apply_pooling(final_img_feautres)
 
         final_img_feautres = final_img_feautres / final_img_feautres.norm(dim=-1, keepdim=True)
-        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-
         if self.training:
             logit_scale = self.logit_scale.exp()
-            logits_per_image = logit_scale * final_img_feautres @ text_features.t()
-            logits_per_text = logits_per_image.t()
-            loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
-            return logits_per_image, logits_per_text, loss
+            cls_scores = logit_scale * final_img_feautres @ F.normalize(self.cls_score.weight, p=2.0, dim=1).t()
+            ce_loss_fn = nn.CrossEntropyLoss()
+            loss = ce_loss_fn(cls_scores, labels)
+            # loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
+            return final_img_feautres, None, loss
         else:
             logits_per_image = self.logit_scale * final_img_feautres @ text_features.t()
             logits_per_text = logits_per_image.t()
