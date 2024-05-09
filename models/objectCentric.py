@@ -52,14 +52,14 @@ class ObjectCentric(nn.Module):
         self.slot_attention = SlotAttention(self.dim, self.dim, ff_mlp=self.mlp)
         self.all_class_prompts = self.get_class_prompts(classnames)
         self.cls_score = nn.Linear(self.dim//2, len(self.all_class_prompts), bias=False)
-        with torch.no_grad():
-            prompts = clip.tokenize(self.all_class_prompts).to(self.device)
-            # print("our device is  ", device)
-            # print("prompt device is ", prompts)
-            # print("clip text encoder device is : ", self.clipTextEncoder.device)
-            text_features = clipTextEncoder.to(device)(prompts)
-            self.cls_score.weight.copy_(text_features)
-            self.cls_score.requires_grad_(False)
+        # with torch.no_grad():
+        #     prompts = clip.tokenize(self.all_class_prompts).to(self.device)
+        #     # print("our device is  ", device)
+        #     # print("prompt device is ", prompts)
+        #     # print("clip text encoder device is : ", self.clipTextEncoder.device)
+        #     text_features = clipTextEncoder.to(device)(prompts)
+        #     self.cls_score.weight.copy_(text_features)
+        #     self.cls_score.requires_grad_(False)
 
     # def gen_contrastive_prompts(self, classnames, prompt_prefix, llm_descriptions,
     #                             countries_name=['usa', 'asia'], clip_model=None):
@@ -122,7 +122,8 @@ class ObjectCentric(nn.Module):
         final_img_feautres = final_img_feautres / final_img_feautres.norm(dim=-1, keepdim=True)
         if self.training:
             logit_scale = self.logit_scale.exp()
-            cls_scores = logit_scale * final_img_feautres @ F.normalize(self.cls_score.weight, p=2.0, dim=1).t()
+            # cls_scores = logit_scale * final_img_feautres @ F.normalize(self.cls_score.weight, p=2.0, dim=1).t()
+            cls_scores = self.cls_score(logit_scale *final_img_feautres)
             ce_loss_fn = nn.CrossEntropyLoss()
             loss = ce_loss_fn(cls_scores, labels)
             # loss = self.compute_contrastive_loss(logits_per_image, logits_per_text, labels)
