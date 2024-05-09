@@ -51,6 +51,9 @@ def main():
     model_fe = Baseline()
     model_fe.fc = torch.nn.Identity()
     model_fe = model_fe.cuda()
+    model_cls = get_model(cfg['model']['classifier']).cuda()
+
+    model_fe = model_cls
     params = [{'params': model_fe.parameters(), 'lr': 1}]
     fe_list = [model_fe]
 
@@ -145,7 +148,7 @@ def main():
 
         scheduler.step()
 
-        trainer(batch_iterator, model_fe, model_cls, *d_list, opt, it, *criterion_list,
+        trainer(batch_iterator, model, *d_list, opt, it, *criterion_list,
                 cfg, logger, writer)
 
         if (it + 1) % cfg['training']['val_interval'] == 0:
