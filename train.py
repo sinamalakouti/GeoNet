@@ -52,17 +52,18 @@ def main():
     model_fe.fc = torch.nn.Identity()
     model_fe = model_fe.cuda()
     # model_cls = get_model(cfg['model']['classifier']).cuda()
-
-    model_fe.fc = nn.Linear(2048, 150)
-    params = [{'params': model_fe.parameters(), 'lr': 1}]
-    fe_list = [model_fe]
-
     model_cls = get_model(cfg['model']['classifier']).cuda()
-    params += [{'params': model_cls.parameters(), 'lr': 10}]
-    cls_list = [model_cls]
+    model_fe.fc = model_cls
 
-    total_n_params = sum([p.numel() for p in model_fe.parameters()]) + \
-                     sum([p.numel() for p in model_cls.parameters()])
+    params = [{'params': model_fe.parameters(), 'lr': 1}]
+    # fe_list = [model_fe]
+
+    # model_cls = get_model(cfg['model']['classifier']).cuda()
+    # params += [{'params': model_cls.parameters(), 'lr': 10}]
+    # cls_list = [model_cls]
+
+    # total_n_params = sum([p.numel() for p in model_fe.parameters()]) + \
+    #                  sum([p.numel() for p in model_cls.parameters()])
 
     d_list = []
     if cfg['model'].get('discriminator', None):
