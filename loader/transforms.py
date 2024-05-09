@@ -1,7 +1,7 @@
 import torchvision
 from clip.clip import BICUBIC, _convert_image_to_rgb
-from timm.data import ToTensor
-from torchvision.transforms import Compose, Resize, CenterCrop, Normalize
+
+from torchvision.transforms import Compose, Resize, CenterCrop, Normalize, ToTensor
 
 
 # class ResizeImage():
