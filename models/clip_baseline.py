@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import clip
+# import clip
 import numpy as np
 from models.clip_model.clip_model import ClipImageModel, ClipTextModel
 from models.slotAttention import SlotAttention
@@ -35,9 +35,10 @@ CUSTOM_TEMPLATES = {
 class CLIP_baseline(nn.Module):
     def __init__(self, cfg, device, classnames):
         super().__init__()
-        clip_model, preprocess = clip.load("RN50", device=device)
-        self.visual = clip_model.visual
+        # clip_model, preprocess = clip.load("RN50", device=device)
+        # self.visual = clip_model.visual
         self.visual = models.resnet50()
+        self.visual.fc = nn.Identity()
         self.device = device
         self.dim = 2048
         self.w = 7
@@ -45,7 +46,7 @@ class CLIP_baseline(nn.Module):
         self.hidden_dim = self.dim
         self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
         self.all_class_prompts = self.get_class_prompts(classnames)
-        self.cls_score = nn.Linear(self.dim//2, len(self.all_class_prompts), bias=False).float()
+        self.cls_score = nn.Linear(self.dim, len(self.all_class_prompts), bias=False).float()
         # with torch.no_grad():
         #     prompts = clip.tokenize(self.all_class_prompts).to(self.device)
         #     self.text_features = self.clipTextEncoder(prompts)
