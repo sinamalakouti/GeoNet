@@ -137,7 +137,7 @@ def main():
 
     logger.info('Start training from iteration {}'.format(start_it))
     model = Baseline()
-    opt = optim.SGD(model.parameters(), lr=0.01)
+    opt = optim.SGD(model.parameters(), lr=0.1)
     scheduler = get_scheduler(opt, cfg['training']['scheduler'])
 
     if n_gpu > 1 and device == 'cuda':

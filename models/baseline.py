@@ -20,7 +20,7 @@ class Baseline(nn.Module):
         self.visual.fc == nn.Linear(2048, 150)
         self.visual = self.visual.cuda()
 
-    def forward(self, x, labels):
+    def forward(self, x, labels=None):
         x = x.cuda()
         img_feautes = self.visual(x)
         ce_loss_fn = nn.CrossEntropyLoss()
