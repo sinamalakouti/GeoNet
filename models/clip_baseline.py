@@ -6,6 +6,8 @@ from models.clip_model.clip_model import ClipImageModel, ClipTextModel
 from models.slotAttention import SlotAttention
 from models.utils import SoftPositionEmbed
 
+from torchvision import models
+
 CUSTOM_TEMPLATES = {
     "OxfordPets": "a photo of a {}, a type of pet.",
     "OxfordFlowers": "a photo of a {}, a type of flower.",
@@ -35,6 +37,7 @@ class CLIP_baseline(nn.Module):
         super().__init__()
         clip_model, preprocess = clip.load("RN50", device=device)
         self.visual = clip_model.visual
+        self.visual = models.resnet50()
         self.device = device
         self.dim = 2048
         self.w = 7
