@@ -15,7 +15,7 @@ def train_objectCentric_trainer(batch_iterator, model, opt, it, device, cfg, log
     (_, img_src, lbl_src, src_idx), (_, img_tgt, lbl_tgt, tgt_idx) = next(batch_iterator)
     img_src, img_tgt, lbl_src, lbl_tgt = img_src.to(device), img_tgt.to(device), lbl_src.to(device), lbl_tgt.to(device)
 
-    image_logits, text_logits, closs = model(img_src, lbl_src)
+    image_logits, text_logits, closs = model(img_src.to(device), lbl_src.to(device))
 
     # compute loss
     print("closs is", closs)
