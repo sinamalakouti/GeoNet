@@ -72,10 +72,11 @@ def val(data_loader, model_fe, model_cls, it, n_classes, logger, writer):
         # forward
         with torch.no_grad():
             if isinstance(model_cls, (list, tuple)):
-                features = model_fe(image)
-                output = torch.sum(torch.stack([cls(features) for cls in model_cls]), dim=0)
+                output = model_fe(image)
+                # output = torch.sum(torch.stack([cls(features) for cls in model_cls]), dim=0)
             else:
-                output = model_cls(model_fe(image))
+                # output = model_cls(model_fe(image))
+                output = model_fe(image)
 
         # measure accuracy
         k = min(n_classes - 1, 5)
