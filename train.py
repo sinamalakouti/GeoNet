@@ -148,7 +148,7 @@ def main():
 
         scheduler.step()
 
-        trainer(batch_iterator, model, *d_list, opt, it, *criterion_list,
+        trainer(batch_iterator, model_fe, *d_list, opt, it, *criterion_list,
                 cfg, logger, writer)
 
         if (it + 1) % cfg['training']['val_interval'] == 0:
