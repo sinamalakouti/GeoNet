@@ -24,4 +24,4 @@ class Baseline(nn.Module):
         x = x.cuda()
         img_feautes = self.visual(x)
         ce_loss_fn = nn.CrossEntropyLoss()
-        return None, None, ce_loss_fn(img_feautes, labels)
+        return img_feautes
