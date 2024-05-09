@@ -12,7 +12,7 @@ def train_plain(batch_iterator, model_fe, model_cls, opt, it, criterion_cls,
 
     # forward
 
-    output_src = model_cls(model_fe(img_src), feat=False)
+    output_src = model_cls(model_fe(img_src, lbl_src), feat=False)
     loss = torch.mean(criterion_cls(output_src, lbl_src).squeeze())
 
     # back propagation
