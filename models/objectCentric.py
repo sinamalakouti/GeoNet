@@ -53,6 +53,9 @@ class ObjectCentric(nn.Module):
         self.all_class_prompts = self.get_class_prompts(classnames)
         with torch.no_grad():
             prompts = clip.tokenize(self.all_class_prompts).to(self.device)
+            print("our device is  ", device)
+            print("prompt device is ", prompts)
+            print("clip text encoder device is : ", self.clipTextEncoder.device)
             self.text_features = self.clipTextEncoder(prompts)
 
     # def gen_contrastive_prompts(self, classnames, prompt_prefix, llm_descriptions,
