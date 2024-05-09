@@ -84,8 +84,6 @@ def main():
     resume_from_ckpt = False
     if os.path.exists(os.path.join(logdir, 'checkpoint.pkl')):
         cfg['training']['resume']['model'] = os.path.join(logdir, 'checkpoint.pkl')
-        cfg['training']['resume']['param_only'] = False
-        cfg['training']['resume']['load_cls'] = True
         resume_from_ckpt = True
 
     # load checkpoint
@@ -93,46 +91,46 @@ def main():
     best_acc_tgt = best_acc_src = 0
     best_acc_tgt_top5 = best_acc_src_top5 = 0
 
-    if cfg['training']['resume'].get('model', None):
-        resume = cfg['training']['resume']
-        resume_model = resume['model']
-        if os.path.isfile(resume_model):
-
-            checkpoint = torch.load(resume_model)
-
-            if resume_from_ckpt:
-                load_dict = checkpoint["model_state"]
-
-            try:
-                model.load_state_dict(load_dict)
-                logger.info('Loading model from checkpoint {}'.format(resume_model))
-            except:
-                model.load_state_dict(cvt2normal_state(load_dict), strict=False)
-                logger.info('Loading model from checkpoint {}'.format(resume_model))
-            ## TODO: add loading additional feature extractors and classifiers
-            if resume.get('load_cls', True):
-                try:
-                    print("noooo loading cls")
-                    model.load_state_dict((checkpoint['model_cls_state']))
-                    logger.info('Loading classifier')
-                except:
-                    model.load_state_dict(cvt2normal_state(checkpoint['model_cls_state']))
-                    logger.info('Loading classifier')
-
-            # if checkpoint.get('model_d_state', None):
-            #     model_d.load_state_dict((checkpoint['model_d_state']))
-
-            if resume['param_only'] is False:
-                start_it = checkpoint['iteration']
-                best_acc_tgt = checkpoint.get('best_acc_tgt', 0)
-                best_acc_src = checkpoint.get('best_acc_src', 0)
-                opt.load_state_dict(checkpoint['opt_main_state'])
-                scheduler.load_state_dict(checkpoint['scheduler_state'])
-                logger.info('Resuming training state ... ')
-
-            logger.info("Loaded checkpoint '{}'".format(resume_model))
-        else:
-            logger.info("No checkpoint found at '{}'".format(resume_model))
+    # if cfg['training']['resume'].get('model', None):
+    #     resume = cfg['training']['resume']
+    #     resume_model = resume['model']
+    #     if os.path.isfile(resume_model):
+    #
+    #         checkpoint = torch.load(resume_model)
+    #
+    #         if resume_from_ckpt:
+    #             load_dict = checkpoint["model_state"]
+    #
+    #         try:
+    #             model.load_state_dict(load_dict)
+    #             logger.info('Loading model from checkpoint {}'.format(resume_model))
+    #         except:
+    #             model.load_state_dict(cvt2normal_state(load_dict), strict=False)
+    #             logger.info('Loading model from checkpoint {}'.format(resume_model))
+    #         ## TODO: add loading additional feature extractors and classifiers
+    #         if resume.get('load_cls', True):
+    #             try:
+    #                 print("noooo loading cls")
+    #                 model.load_state_dict((checkpoint['model_cls_state']))
+    #                 logger.info('Loading classifier')
+    #             except:
+    #                 model.load_state_dict(cvt2normal_state(checkpoint['model_cls_state']))
+    #                 logger.info('Loading classifier')
+    #
+    #         # if checkpoint.get('model_d_state', None):
+    #         #     model_d.load_state_dict((checkpoint['model_d_state']))
+    #
+    #         if resume['param_only'] is False:
+    #             start_it = checkpoint['iteration']
+    #             best_acc_tgt = checkpoint.get('best_acc_tgt', 0)
+    #             best_acc_src = checkpoint.get('best_acc_src', 0)
+    #             opt.load_state_dict(checkpoint['opt_main_state'])
+    #             scheduler.load_state_dict(checkpoint['scheduler_state'])
+    #             logger.info('Resuming training state ... ')
+    #
+    #         logger.info("Loaded checkpoint '{}'".format(resume_model))
+    #     else:
+    #         logger.info("No checkpoint found at '{}'".format(resume_model))
 
     logger.info('Start training from iteration {}'.format(start_it))
 
