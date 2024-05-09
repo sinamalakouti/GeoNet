@@ -51,9 +51,9 @@ def main():
     model_fe = Baseline()
     model_fe.fc = torch.nn.Identity()
     model_fe = model_fe.cuda()
-    model_cls = get_model(cfg['model']['classifier']).cuda()
+    # model_cls = get_model(cfg['model']['classifier']).cuda()
 
-    model_fe = model_cls
+    model_fe = nn.Linear(2048, 150)
     params = [{'params': model_fe.parameters(), 'lr': 1}]
     fe_list = [model_fe]
 
