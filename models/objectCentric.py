@@ -110,9 +110,9 @@ class ObjectCentric(nn.Module):
         labels = labels.to(self.device)
         text_features = self.text_features
         img_feautes, image_pos = self.clipImageEncoder(x)
-        x_pos = self.softpos(img_feautes, image_pos)
-        slots, attn = self.slot_attention(x_pos,  img_feautes)
-
+        # x_pos = self.softpos(img_feautes, image_pos)
+        # slots, attn = self.slot_attention(x_pos,  img_feautes)
+        slots = img_feautes
         final_img_feautres = slots.reshape(slots.shape[0], slots.shape[-1], self.w, self.h)
         final_img_feautres = self.clipImageEncoder.apply_pooling(final_img_feautres)
 
