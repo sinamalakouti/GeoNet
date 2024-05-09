@@ -47,7 +47,7 @@ def main():
     # setup model (feature extractor(s) + classifier(s) + discriminator)
     n_gpu = torch.cuda.device_count()
     import torchvision.models
-    model_fe = models.resnet50().cuda() #get_model(cfg['model']['feature_extractor']).cuda()
+    model_fe = models.resnet50(pretrained=True).cuda() #get_model(cfg['model']['feature_extractor']).cuda()
     model_fe.fc = torch.nn.Identity()
     model_fe = model_fe.cuda()
     params = [{'params': model_fe.parameters(), 'lr': 1}]
