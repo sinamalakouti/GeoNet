@@ -49,7 +49,7 @@ def main():
     # setup model (feature extractor(s) + classifier(s) + discriminator)
     n_gpu = torch.cuda.device_count()
     import torchvision.models
-    model_fe = CLIP_baseline()
+    model_fe = CLIP_baseline(cfg, 'cuda', None)
     model_cls = model_fe.cls_score
     # model_fe.fc = torch.nn.Identity()
     # model_fe = model_fe.cuda()

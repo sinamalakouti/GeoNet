@@ -45,7 +45,7 @@ class CLIP_baseline(nn.Module):
         self.h = 7
         self.hidden_dim = self.dim
         self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
-        self.all_class_prompts = self.get_class_prompts(classnames)
+        # self.all_class_prompts = self.get_class_prompts(classnames)
         self.cls_score = nn.Linear(self.dim, len(self.all_class_prompts), bias=False).float()
         # with torch.no_grad():
         #     prompts = clip.tokenize(self.all_class_prompts).to(self.device)
