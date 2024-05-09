@@ -1,4 +1,8 @@
 import torchvision
+from clip.clip import BICUBIC, _convert_image_to_rgb
+from timm.data import ToTensor
+from torchvision.transforms import Compose, Resize, CenterCrop, Normalize
+
 
 # class ResizeImage():
 #     def __init__(self, size):
@@ -78,12 +82,21 @@ def test_transform():
 
     return trans
 
+def clip_transform():
+    def _transform(n_px):
+        return Compose([
+            Resize(n_px, interpolation=BICUBIC),
+            CenterCrop(n_px),
+            _convert_image_to_rgb,
+            ToTensor(),
+            Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
+        ])
 def transform(split):
 
     trans = {
-        "train" : train_transform(),
-        "val" : val_transform(),
-        "test" : test_transform()
+        "train" : clip_transform(),
+        "val" : clip_transform(),
+        "test" : clip_transform()
     }
     
     try:

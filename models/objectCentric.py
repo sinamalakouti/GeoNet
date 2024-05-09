@@ -79,7 +79,7 @@ class ObjectCentric(nn.Module):
     #             DG_DS_prompts[country].append(norm_avg_cls_embed.cpu())
     #     return DG_DS_prompts
     def get_class_prompts(self, class_names, dataset_name='Geonet'):
-        prompts = [CUSTOM_TEMPLATES[dataset_name].format(cls) for cls in class_names]
+        prompts = [CUSTOM_TEMPLATES[dataset_name].format(cls.replace("-", " ")) for cls in class_names]
         return prompts
 
     # def get_llm_prompt_embedding(self):
